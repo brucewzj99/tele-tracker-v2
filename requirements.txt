@@ -1,0 +1,8 @@
+Flask[async]==2.2.2
+python-telegram-bot==13.7
+requests==2.26.0
+google-api-python-client==2.86.0
+google-auth==2.17.3
+google-auth-httplib2==0.1.0
+pytz==2023.3
+firebase-admin==6.1.0
