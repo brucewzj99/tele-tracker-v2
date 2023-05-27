@@ -16,9 +16,9 @@ You can find the release notes over [here](https://github.com/brucewzj99/tele-tr
 ## Getting Started (Users)
 1. Access the bot on [telegram](https://t.me/telefinance_tracker_bot) 
 2. Use the /start command and follow the instructions given.
-4. Remember to edit the `Dropdown` sheet on Google Sheet to get started.
-![image](https://github.com/brucewzj99/tele-tracker-v2/assets/24997286/bfc9a244-19d5-4521-88bd-088c87f3418c)
-5. Happy using!
+3. Remember to edit the `Dropdown` sheet on Google Sheet to get started.
+![image](https://github.com/brucewzj99/tele-tracker-v2/assets/24997286/664b6e2e-5c56-47b2-b56b-a5b3424bf7bd)
+4. Happy using!
 
 ## Getting Started (Developers)
 ### Step 1
