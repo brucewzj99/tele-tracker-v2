@@ -123,14 +123,15 @@ def config(update, context):
     update.message.reply_text(
         "How can i help you today?", reply_markup=create_inline_markup(list)
     )
-    return CS.CONFIG__HANDLER
+    return CS.CONFIG_HANDLER
 
 
 def config_handler(update, context) -> int:
     reply = update.callback_query.data
     update.callback_query.answer()
     if reply == "Cancel":
-        cancel(update, context)
+        update.callback_query.edit_message_text(END_TEXT, reply_markup=None)
+        return ConversationHandler.END
     update.callback_query.edit_message_text(reply, reply_markup=None)
     if reply == "Change Google Sheet":
         update.callback_query.message.reply_text(SETUP_TEXT)
@@ -155,7 +156,7 @@ def config_handler(update, context) -> int:
                 return CS.CONFIG_SETUP
             elif reply == "Configure Quick Others":
                 context.user_data["config"] = EntryType.OTHERS
-                msg = f'This is your current Others settings.\nClick on "Add new" to add a new one (max 5).\nIf you wish to update, you will have to do so manually in the "Tracker" sheet.\n\nPayment, Category\n'
+                msg = QUICK_OTHER_TEXT
                 setting_list = gs.get_quick_add_others(context.user_data["sheet_id"])
                 keyboard_list = []
                 if setting_list == None:
@@ -163,7 +164,7 @@ def config_handler(update, context) -> int:
                 else:
                     for setting in setting_list:
                         msg = f"{msg}{setting}\n"
-                if len(setting_list) < 5:
+                if len(setting_list) < QUICK_OTHER_LIMIT:
                     keyboard_list.append("Add new")
                 keyboard_list.append("Cancel")
                 update.callback_query.message.reply_text(
@@ -192,7 +193,8 @@ def config_setup(update, context) -> int:
     except Exception as e:
         update.callback_query.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
-    cancel(update, context)
+    update.callback_query.edit_message_text(END_TEXT, reply_markup=None)
+    return ConversationHandler.END
 
 
 def config_category(update, context) -> int:

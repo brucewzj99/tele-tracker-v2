@@ -41,14 +41,19 @@ BACK_TEXT = "<< Back"
 
 QUICK_SETUP_TRANSPORT = "You have not set up your quick add settings for transport yet, please do so by typing /config"
 QUICK_SETUP_OTHER = "You have not set up your quick add settings for others yet, please do so by typing /config"
+QUICK_OTHER_LIMIT = 5  # max i can go is 10, but testing with 5 first
+QUICK_OTHER_TEXT = f'This is your current Others settings.\nClick on "Add new" to add a new one (max {QUICK_OTHER_LIMIT}).\nIf you wish to update, you will have to do so manually in the "Tracker" sheet.\n\nPayment, Category\n'
 
 HELP_TEXT = (
     "To get started, please type /start\n"
     + "Remember to configure your Dropdown sheet to get started on this bot.\n\n"
-    + "To configure, type /config\n"
-    + "To add entry, type /addentry\n"
-    + "To add transport quickly, type /addtransport\n"
-    + "To add others quickly, type /addothers\n"
+    + "/config - Update Sheet Settings"
+    + "/addentry - Add Expense Entry\n"
+    + "/addtransport - Quick Add Transport Entry\n"
+    + "/addothers - Quick Add Other Entry\n"
+    + "/addincome - Add Income Entry\n"
+    + "/retrievetransaction - Retrieve transaction from dates\n"
+    + "/cancel - Cancel Conversation\n"
 )
 
 RETRIEVE_TRANSACTION_TEXT = "Please specify the date and month you wish to retrieve from in this format: DD MMM\ne.g 16 Mar\nor use /cancel to exit"

@@ -1,5 +1,6 @@
 # Tele-Tracker Bot
 A python telegram bot to help track daily expenses onto google sheet, hosted on Vercel using Flask.
+
 [Version 1](https://github.com/brucewzj99/tele-tracker) was hosted locally with a different version of python-telegram-bot
 
 ## Release Notes
