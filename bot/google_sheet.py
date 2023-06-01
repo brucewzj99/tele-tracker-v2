@@ -22,6 +22,7 @@ payment_sub_range = [
 payment_main_range = "Dropdown!A12:J12"
 quick_others_range = "Tracker!I3:J13"
 income_range = "Dropdown!L2:L9"
+overall_range = "!M13:O25"
 
 
 def get_main_dropdown_value(sheet_id, entry_type):
@@ -266,7 +267,7 @@ def get_quick_add_others(sheet_id):
     return others_list
 
 
-def retrieve_transaction(sheet_id, month, date):
+def get_day_transaction(sheet_id, month, date):
     result = (
         sheets_api.spreadsheets()
         .values()
@@ -353,3 +354,12 @@ def update_income(sheet_id, month, row_data):
         body=body_r,
     ).execute()
     return True
+
+def get_overall(sheet_id, month):
+    result = (
+        sheets_api.spreadsheets()
+        .values()
+        .get(spreadsheetId=sheet_id, range=f"{month}{overall_range}")
+        .execute()
+    )
+    return result.get("values", [])

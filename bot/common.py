@@ -26,8 +26,9 @@ class ConversationState(Enum):
         CONFIG_SUBCATEGORY,
         CONFIG_PAYMENT,
         CONFIG_SUBPAYMENT,
-        HANDLE_RETRIEVE_TRANSACTION,
+        HANDLE_GET_TRANSACTION,
+        HANDLE_GET_OVERALL,
         INCOME,
         WORK_PLACE,
         CPF,
-    ) = range(22)
+    ) = range(23)

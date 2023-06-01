@@ -50,3 +50,13 @@
 ## Version 2.0.2 - Date 1 Jun 2023
 ### Bug Fix 🛠️
 - Day 1 sum creation bug
+
+## Version 2.1.0 - Date 1 Jun 2023
+### New Features 🆕
+- Added get overall functions
+
+### Enhancement 🔥
+- Rename retrievetransaction to getdaytransaction
+
+### For Developer 🧑‍💻
+- When you run test.py, ngrok will auto setup with the correct webhook!
