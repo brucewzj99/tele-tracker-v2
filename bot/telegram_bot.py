@@ -37,6 +37,10 @@ def check_date_format(date_string):
     pattern = r"\b\d{1,2}\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b"
     return bool(re.fullmatch(pattern, date_string, re.IGNORECASE))
 
+def check_month_format(month_string):
+    pattern = r"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$"
+    return bool(re.fullmatch(pattern, month_string, re.IGNORECASE))
+
 
 def get_category_text(sheet_id, entry_type):
     msg = ""
@@ -608,26 +612,36 @@ def help(update, context):
     update.message.reply_text(HELP_TEXT)
 
 
-def retrieve_transaction(update, context):
+def get_day_transaction(update, context):
     context.user_data.clear()
     telegram_id = update.effective_user.id
     try:
         context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id)
-        update.message.reply_text(RETRIEVE_TRANSACTION_TEXT)
-        return CS.HANDLE_RETRIEVE_TRANSACTION
+        update.message.reply_text(GET_TRANSACTION_TEXT)
+        return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
 
+def get_overall(update, context):
+    context.user_data.clear()
+    telegram_id = update.effective_user.id
+    try:
+        context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id)
+        update.message.reply_text(GET_OVERALL_TEXT)
+        return CS.HANDLE_GET_OVERALL
+    except Exception as e:
+        update.message.reply_text(ERROR_TEXT)
+        return ConversationHandler.END
 
-def handle_retrieve_transaction(update, context):
+def handle_get_transaction(update, context):
     sheet_id = context.user_data["sheet_id"]
     reply = update.message.text
     msg = ""
     try:
         if check_date_format(reply):
             day, month = reply.split(" ")
-            total_spend, transport_values, other_values = gs.retrieve_transaction(
+            total_spend, transport_values, other_values = gs.get_day_transaction(
                 sheet_id, month, day
             )
             if not total_spend:
@@ -643,11 +657,32 @@ def handle_retrieve_transaction(update, context):
             update.message.reply_text(msg)
             return ConversationHandler.END
         else:
-            update.message.reply_text(RETRIEVE_TRANSACTION_TEXT)
-            return CS.HANDLE_RETRIEVE_TRANSACTION
+            update.message.reply_text(GET_TRANSACTION_TEXT)
+            return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
 
+def handle_get_overall(update, context):
+    sheet_id = context.user_data["sheet_id"]
+    month = update.message.text
+    msg = ""
+    try:
+        if check_month_format(month):
+            values = gs.get_overall(sheet_id, month)
+            msg  = "```\n"
+            for row in values:
+                if len(row) == 3:
+                    msg += "{:<20} {:<10} {:<10}\n".format(*row)
+                elif len(row) == 2:
+                    msg += "{:<20} {:<10}\n".format(*row)
+            msg += "```"
+            update.message.reply_text(msg, parse_mode='Markdown')
+            return ConversationHandler.END
+        else:
+            update.message.reply_text(GET_OVERALL_TEXT)
+            return CS.HANDLE_GET_OVERALL
+    except Exception as e:
+        update.message.reply_text(ERROR_TEXT)
 
 def add_income(update, context):
     context.user_data.clear()
@@ -749,9 +784,12 @@ def setup_handlers(dispatcher):
     }
 
     # Retrieve transaction-related states and handlers
-    retrieve_transaction_states = {
-        CS.HANDLE_RETRIEVE_TRANSACTION: [
-            MessageHandler(Filters.text & ~Filters.command, handle_retrieve_transaction)
+    get_transaction_states = {
+        CS.HANDLE_GET_TRANSACTION: [
+            MessageHandler(Filters.text & ~Filters.command, handle_get_transaction)
+        ],
+        CS.HANDLE_GET_OVERALL: [
+            MessageHandler(Filters.text & ~Filters.command, handle_get_overall)
         ],
     }
 
@@ -768,7 +806,8 @@ def setup_handlers(dispatcher):
             CommandHandler("addtransport", add_transport),
             CommandHandler("addothers", add_others),
             CommandHandler("addincome", add_income),
-            CommandHandler("retrievetransaction", retrieve_transaction),
+            CommandHandler("getdaytransaction", get_day_transaction),
+            CommandHandler("getoverall", get_overall)
         ],
         states={
             CS.SET_UP: [MessageHandler(Filters.text & ~Filters.command, set_up)],
@@ -776,7 +815,7 @@ def setup_handlers(dispatcher):
             **config_states,
             **entry_states,
             **quick_add_states,
-            **retrieve_transaction_states,
+            **get_transaction_states,
             **add_income_states,
         },
         fallbacks=[CommandHandler("cancel", cancel)],

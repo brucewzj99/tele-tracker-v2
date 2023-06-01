@@ -52,16 +52,18 @@ HELP_TEXT = (
     + "/addtransport - Quick Add Transport Entry\n"
     + "/addothers - Quick Add Other Entry\n"
     + "/addincome - Add Income Entry\n"
-    + "/retrievetransaction - Retrieve transaction from dates\n"
+    + "/getdaytransaction - Retrieve transaction from dates\n"
+    + "/getoverall - Retrieve overall transaction for a month\n"
     + "/cancel - Cancel Conversation\n"
     + "\nTo report bugs, please create a issue at https://github.com/brucewzj99/tele-tracker-v2/issues or contact me @bruceeew on Telegram"
 )
 
-RETRIEVE_TRANSACTION_TEXT = "Please specify the date and month you wish to retrieve from in this format: DD MMM\ne.g 16 Mar\nor use /cancel to exit"
+GET_TRANSACTION_TEXT = "Please specify the date and month you wish to retrieve from in this format: DD MMM\ne.g 16 Mar\nor use /cancel to exit"
+GET_OVERALL_TEXT = "Please specify the month you wish to retrieve your overall transaction in this format: MMM\ne.g Mar\nor use /cancel to exit"
 
 ADD_INCOME_TEXT = "Add income\nPlease state your income followed by any remarks (optional): [income],[remarks]\ne.g. 2000, Something"
 ADD_INCOME_RETRY_TEXT = (
-    "Please follow this format: [income],[remarks]\ne.g. 2000, Something"
+    "Please follow this format:\n[income],[remarks]\ne.g. 2000, Something"
 )
 CHOOSE_INCOME_SOURCE_TEXT = "Please choose your income source"
 CPF_TEXT = "Is there CPF?"

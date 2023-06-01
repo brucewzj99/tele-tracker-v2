@@ -37,8 +37,11 @@ pip install -r requirements.txt
 * Retrieve your firebase database url
 * Set up telegram bot via [BotFather](https://t.me/BotFather)
 * Insert all of them into .env as follows, you can use py dotenv or set it as env variable in your venv
+* You can use the same TOKEN for BOT_TOKEN & TEST_TOKEN but I recommend using two different bots for testing and production
+
 ``` .env
 BOT_TOKEN=your_bot_token
+TEST_TOKEN=your_test_token
 DATABASE_URL=firebase_url
 GOOGLE_API_EMAIL=google_api_email
 FIREBASE_JSON=service_account_key
@@ -46,19 +49,6 @@ GOOGLE_JSON=service_account_key
 ```
 
 ### Step 3
-* Run ngrok
-``` terminal
-ngrok http 5000
-```
-* Copy the link, it should look something like this 'https://<address>.ap.ngrok.io'
-* Set up web hook by opening this link:
-``` url
-https://api.telegram.org/bot<bot_token>/setwebhook?url=https://<address>.ap.ngrok.io/webhook
-```
-* You should see this:
-``` json
-{"ok":true,"result":true,"description":"Webhook was set"}
-```
 * Proceed to project directory and run:
 ``` python
 python3.9 test.py
@@ -77,7 +67,9 @@ python3.9 test.py
 
 /addincome - Add Income Entry
 
-/retrievetransaction - Retrieve transaction from dates
+/getdaytransaction - Retrieve transaction from dates
+
+/getoverall - Retrieve overall transaction for a month
 
 /cancel - Cancel Conversation
 
@@ -101,4 +93,4 @@ Bruce Wang: hello@brucewzj.com
 
 LinkedIn: [https://www.linkedin.com/in/brucewzj/](https://www.linkedin.com/in/brucewzj/)
 
-Project Link: [https://github.com/brucewzj99/tele-tracker](https://github.com/brucewzj99/tele-tracker)
+Project Link: [https://github.com/brucewzj99/tele-tracker-v2](https://github.com/brucewzj99/tele-tracker-v2)
