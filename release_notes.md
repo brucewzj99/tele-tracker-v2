@@ -37,3 +37,8 @@
 - python-telegram-bot library changed to 13.7
 - Move services account to environment variable
 - Please read the new README for developer
+
+
+## Version 2.0.1 - Date 1 Jun 2023
+### Bug Fix 🛠️
+- Fix month abbreviation
