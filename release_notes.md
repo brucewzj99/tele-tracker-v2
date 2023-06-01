@@ -42,3 +42,8 @@
 ## Version 2.0.1 - Date 1 Jun 2023
 ### Bug Fix 🛠️
 - Fix month abbreviation
+- Fix updating of previous month
+
+### For Developer 🧑‍💻
+- Added a new updates.py file to push updates to all users
+- To run updates, call functions in push_updates.py

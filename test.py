@@ -4,7 +4,7 @@ from flask import Flask, request
 import os
 from bot.telegram_bot import setup_handlers
 
-TOKEN = os.environ.get("BOT_TOKEN")
+TOKEN = os.environ.get("TEST_TOKEN")
 app = Flask(__name__)
 updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher

@@ -484,14 +484,15 @@ def log_transaction(user_data, update):
     # start new date if date elapsed
     if day_tracker < day or day == 1:
         msg = f"New entry for {day} {month}"
+        prev_month = month
         if day == 1:
-            month = (current_datetime - dt.timedelta(days=1)).strftime("%b")
+            prev_month = (current_datetime - dt.timedelta(days=1)).strftime("%b")
         # update prev day
         msg = f"{msg}\nCreating sum for day {day_tracker}"
-        gs.update_prev_day(sheet_id, month, first_row)
+        gs.update_prev_day(sheet_id, prev_month, first_row)
         if day == 1:
-            new_row = 5
-            first_row = 6
+            new_row = 4
+            first_row = 5
             gs.update_rows(sheet_id, 1, new_row, first_row)
         else:
             new_row = gs.get_new_row(sheet_id, month)
