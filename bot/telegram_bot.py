@@ -462,7 +462,7 @@ def log_transaction(user_data, update):
     # datatime data
     current_datetime = dt.datetime.now(timezone)
     day = current_datetime.day
-    month = current_datetime.strftime("%b")
+    month = current_datetime.strftime("%B")
 
     # tracker data
     day_tracker = int(trackers[0])
@@ -483,7 +483,7 @@ def log_transaction(user_data, update):
     if day_tracker < day or day == 1:
         msg = f"New entry for {day} {month}"
         if day == 1:
-            month = (current_datetime - dt.timedelta(days=1)).strftime("%b")
+            month = (current_datetime - dt.timedelta(days=1)).strftime("%B")
         # update prev day
         msg = f"{msg}\nCreating sum for day {day_tracker}"
         gs.update_prev_day(sheet_id, month, first_row)
@@ -706,7 +706,7 @@ def cpf(update, context) -> int:
     try:
         row_data = [income, place, cpf, remarks]
         current_datetime = dt.datetime.now(timezone)
-        month = current_datetime.strftime("%b")
+        month = current_datetime.strftime("%B")
         if gs.update_income(sheet_id, month, row_data):
             update.callback_query.message.reply_text("Income has been added!")
         else:
