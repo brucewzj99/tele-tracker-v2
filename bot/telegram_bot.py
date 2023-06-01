@@ -482,7 +482,7 @@ def log_transaction(user_data, update):
 
     msg = ""
     # start new date if date elapsed
-    if day_tracker < day or day == 1:
+    if day_tracker != day:
         msg = f"New entry for {day} {month}"
         prev_month = month
         if day == 1:

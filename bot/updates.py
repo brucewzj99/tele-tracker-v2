@@ -10,6 +10,7 @@ def send_new_feature_message(new_feature_message):
     users = fb.get_all_user_id()
     for user_id in users:
         bot.send_message(chat_id=user_id, text=new_feature_message)
+    print("Message has been pushed to all users")
 
 
 def update_gsheet():

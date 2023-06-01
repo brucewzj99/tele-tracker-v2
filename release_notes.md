@@ -38,7 +38,6 @@
 - Move services account to environment variable
 - Please read the new README for developer
 
-
 ## Version 2.0.1 - Date 1 Jun 2023
 ### Bug Fix 🛠️
 - Fix month abbreviation
@@ -47,3 +46,7 @@
 ### For Developer 🧑‍💻
 - Added a new updates.py file to push updates to all users
 - To run updates, call functions in push_updates.py
+
+## Version 2.0.2 - Date 1 Jun 2023
+### Bug Fix 🛠️
+- Day 1 sum creation bug
