@@ -16,7 +16,7 @@ from bot.text_str import *
 from bot.common import EntryType
 from bot.common import ConversationState as CS
 import bot.google_sheet as gs
-import bot.firebase as db
+import bot.firestore as db
 
 timezone = pytz.timezone("Asia/Singapore")
 
@@ -36,6 +36,7 @@ def is_valid_price(price):
 def check_date_format(date_string):
     pattern = r"\b\d{1,2}\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b"
     return bool(re.fullmatch(pattern, date_string, re.IGNORECASE))
+
 
 def check_month_format(month_string):
     pattern = r"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$"
@@ -623,6 +624,7 @@ def get_day_transaction(update, context):
         update.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
 
+
 def get_overall(update, context):
     context.user_data.clear()
     telegram_id = update.effective_user.id
@@ -633,6 +635,7 @@ def get_overall(update, context):
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
+
 
 def handle_get_transaction(update, context):
     sheet_id = context.user_data["sheet_id"]
@@ -662,27 +665,41 @@ def handle_get_transaction(update, context):
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
 
+
 def handle_get_overall(update, context):
     sheet_id = context.user_data["sheet_id"]
     month = update.message.text
-    msg = ""
     try:
         if check_month_format(month):
             values = gs.get_overall(sheet_id, month)
-            msg  = "```\n"
-            for row in values:
-                if len(row) == 3:
-                    msg += "{:<20} {:<10} {:<10}\n".format(*row)
-                elif len(row) == 2:
-                    msg += "{:<20} {:<10}\n".format(*row)
-            msg += "```"
-            update.message.reply_text(msg, parse_mode='Markdown')
+
+            final_income = values[0]
+            msg = f"--- Final Income ---\n`{final_income[2]}`\n\n"
+
+            msg += "--- Spending ---\n"
+            max_len = (
+                max(len(row[0]) for row in values[1:-2]) + 1
+            )  # +1 for some extra space
+            for row in values[1:-2]:
+                if row[1].startswith("-"):  # if value is negative
+                    msg += f"`{row[0].ljust(max_len)}{row[1]}`\n"
+                else:
+                    msg += f"`{row[0].ljust(max_len)} {row[1]}`\n"  # else keep the original space
+
+            total_spent = values[-2]
+            msg += f"\n--- Total Spent ---\n`{total_spent[1]}`\n"
+
+            overall = values[-1]
+            msg += f"\n--- Overall ---\n`{overall[2]}`\n"
+
+            update.message.reply_text(msg, parse_mode="Markdown")
             return ConversationHandler.END
         else:
             update.message.reply_text(GET_OVERALL_TEXT)
             return CS.HANDLE_GET_OVERALL
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
+
 
 def add_income(update, context):
     context.user_data.clear()
@@ -807,7 +824,7 @@ def setup_handlers(dispatcher):
             CommandHandler("addothers", add_others),
             CommandHandler("addincome", add_income),
             CommandHandler("getdaytransaction", get_day_transaction),
-            CommandHandler("getoverall", get_overall)
+            CommandHandler("getoverall", get_overall),
         ],
         states={
             CS.SET_UP: [MessageHandler(Filters.text & ~Filters.command, set_up)],
