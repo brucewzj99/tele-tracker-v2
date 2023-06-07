@@ -60,3 +60,9 @@
 
 ### For Developer 🧑‍💻
 - When you run test.py, ngrok will auto setup with the correct webhook!
+
+
+## Version 2.1.1 - Date 8 Jun 2023
+### Enhancement 🔥
+- Migrate to use firestore
+- Reformatted get overall transaction
