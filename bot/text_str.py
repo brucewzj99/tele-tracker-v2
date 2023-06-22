@@ -47,7 +47,7 @@ QUICK_OTHER_TEXT = f'This is your current Others settings.\nClick on "Add new" t
 HELP_TEXT = (
     "To get started, please type /start\n"
     + "Remember to configure your Dropdown sheet to get started on this bot.\n\n"
-    + "/config - Update Sheet Settings"
+    + "/config - Update Sheet Settings\n"
     + "/addentry - Add Expense Entry\n"
     + "/addtransport - Quick Add Transport Entry\n"
     + "/addothers - Quick Add Other Entry\n"
