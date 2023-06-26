@@ -66,3 +66,8 @@
 ### Enhancement 🔥
 - Migrate to use firestore
 - Reformatted get overall transaction
+
+## Version 2.1.2 - Date 26 Jun 2023
+### Bug Fix 🛠️
+- When new users join, new date entry was not created
+- Quick add settings not sending proper error message when either transport or others has been configured
