@@ -93,7 +93,9 @@ def set_up(update, context) -> int:
             db.new_user_setup(telegram_id, sheet_id)
             current_datetime = dt.datetime.now(timezone)
             day = current_datetime.day
+            month = current_datetime.strftime("%b")
             gs.update_rows(sheet_id, day, 4, 5)  # New users start from row 5
+            gs.create_date(sheet_id, day, month, 5)
             update.message.reply_text(SUCCESS_LINK_TEXT)
             return ConversationHandler.END
         except Exception as e:
@@ -544,7 +546,7 @@ def add_transport(update, context):
     except Exception as e:
         update.callback_query.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
-    if setting_list is None or setting_list[0] is None:
+    if not setting_list or not setting_list[0]:
         update.message.reply_text(QUICK_SETUP_TRANSPORT)
         return ConversationHandler.END
     else:
@@ -569,7 +571,7 @@ def add_others(update, context):
     except Exception as e:
         update.callback_query.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
-    if setting_list is None or setting_list[0] is None:
+    if not setting_list or not setting_list[0]:
         update.message.reply_text(QUICK_SETUP_OTHER)
         return ConversationHandler.END
     else:
