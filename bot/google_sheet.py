@@ -20,9 +20,13 @@ payment_sub_range = [
     f"Dropdown!{chr(i)}12:{chr(i)}19" for i in range(ord("A"), ord("K"))
 ]
 payment_main_range = "Dropdown!A12:J12"
-quick_others_range = "Tracker!I3:J13"
 income_range = "Dropdown!L2:L9"
 overall_range = "!M13:O25"
+
+tracker_range = "Tracker!B3:E3"
+quick_add_range = "Tracker!G3:J3"
+quick_others_range = "Tracker!I3:J13"
+quick_transport_range = "Tracker!G3:H3"
 
 
 def get_main_dropdown_value(sheet_id, entry_type):
@@ -151,7 +155,7 @@ def get_trackers(sheet_id):
     result = (
         sheets_api.spreadsheets()
         .values()
-        .get(spreadsheetId=sheet_id, range=f"Tracker!B3:E3")
+        .get(spreadsheetId=sheet_id, range=tracker_range)
         .execute()
     )
     values = result.get("values", [])
@@ -160,7 +164,7 @@ def get_trackers(sheet_id):
 
 def update_rows(sheet_id, day, new_row, first_row):
     values = [[day] + [new_row] * 2 + [first_row]]
-    range_name = "Tracker!B3:E3"
+    range_name = tracker_range
     body = {"values": values}
     request = (
         sheets_api.spreadsheets()
@@ -176,7 +180,7 @@ def update_rows(sheet_id, day, new_row, first_row):
 
 
 def row_incremental(sheet_id, entry_type):
-    range_name = "Tracker!B3:E3"
+    range_name = tracker_range
     response = (
         sheets_api.spreadsheets()
         .values()
@@ -202,7 +206,7 @@ def row_incremental(sheet_id, entry_type):
 
 
 def get_quick_add_settings(sheet_id, entry_type):
-    range_name = "Tracker!G3:J3"
+    range_name = quick_add_range
     response = (
         sheets_api.spreadsheets()
         .values()
@@ -226,7 +230,7 @@ def get_quick_add_settings(sheet_id, entry_type):
 
 def update_quick_add_settings(sheet_id, entry_type, payment, type):
     if entry_type == EntryType.TRANSPORT:
-        range_name = "Tracker!G3:H3"
+        range_name = quick_transport_range
     else:
         last_row = (
             sheets_api.spreadsheets()
