@@ -33,7 +33,7 @@ pip install -r requirements.txt
 * Go to Google Cloud Platform
 * Set up Google Sheet API, download service account key
 * Retrieve Google Sheet API email
-* Set up Firebase Realtime Database, download service account key
+* Set up Firebase Firestore Database, download service account key
 * Retrieve your firebase database url
 * Set up telegram bot via [BotFather](https://t.me/BotFather)
 * Insert all of them into .env as follows, you can use py dotenv or set it as env variable in your venv
