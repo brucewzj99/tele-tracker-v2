@@ -10,15 +10,18 @@ app = Flask(__name__)
 updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
 
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     update = Update.de_json(request.get_json(), updater.bot)
     dispatcher.process_update(update)
     return "OK"
 
+
 @app.route("/")
 def index():
     return "Bot is running!"
+
 
 setup_handlers(dispatcher)
 

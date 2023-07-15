@@ -21,6 +21,7 @@ class ConversationState(Enum):
         SUBPAYMENT,
         QUICK_ADD,
         QUICK_ADD_CATEGORY,
+        QUICK_ADD_TRANSPORT,
         CONFIG_SETUP,
         CONFIG_CATEGORY,
         CONFIG_SUBCATEGORY,
@@ -31,4 +32,4 @@ class ConversationState(Enum):
         INCOME,
         WORK_PLACE,
         CPF,
-    ) = range(23)
+    ) = range(24)

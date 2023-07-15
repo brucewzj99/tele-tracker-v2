@@ -71,3 +71,16 @@
 ### Bug Fix 🛠️
 - When new users join, new date entry was not created
 - Quick add settings not sending proper error message when either transport or others has been configured
+
+
+## Version 2.1.3 - Date 16 July 2023
+### Enhancement 🔥
+- Allows user to add multiple settings for quick transport
+   - If there is only one settings, that will be used as default (/addtransport only)
+- Revamp Google Sheet with new looks
+
+### Bug Fix 🛠️
+- Skip empty cells for payment & category
+
+### For Developer 🧑‍💻
+- Remove firebase codes

@@ -1,5 +1,5 @@
 import os
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import (
     CommandHandler,
     ConversationHandler,
@@ -24,7 +24,10 @@ timezone = pytz.timezone("Asia/Singapore")
 def create_inline_markup(list):
     keyboard_markup_list = []
     for reply in list:
-        keyboard_markup_list.append([InlineKeyboardButton(reply, callback_data=reply)])
+        if reply:
+            keyboard_markup_list.append(
+                [InlineKeyboardButton(reply, callback_data=reply)]
+            )
     return InlineKeyboardMarkup(keyboard_markup_list)
 
 
@@ -74,7 +77,7 @@ def start(update, context):
             )
             return CS.RESET_UP
         else:
-            update.message.reply_text(SETUP_TEXT)
+            update.message.reply_text(SETUP_TEXT, parse_mode=ParseMode.HTML)
             return CS.SET_UP
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
@@ -110,7 +113,7 @@ def reset_up(update, context) -> int:
     reply = update.callback_query.data
     update.callback_query.answer()
     if reply == "Yes":
-        update.callback_query.message.reply_text(SETUP_TEXT)
+        update.callback_query.message.reply_text(SETUP_TEXT, parse_mode=ParseMode.HTML)
         return CS.SET_UP
     else:
         update.callback_query.edit_message_text(END_TEXT, reply_markup=None)
@@ -141,43 +144,35 @@ def config_handler(update, context) -> int:
         return ConversationHandler.END
     update.callback_query.edit_message_text(reply, reply_markup=None)
     if reply == "Change Google Sheet":
-        update.callback_query.message.reply_text(SETUP_TEXT)
+        update.callback_query.message.reply_text(SETUP_TEXT, parse_mode=ParseMode.HTML)
         return CS.SET_UP
     else:
         try:
             if reply == "Configure Quick Transport":
                 context.user_data["config"] = EntryType.TRANSPORT
-                msg = f"This is your current Transport settings.\n"
-                setting_list = gs.get_quick_add_settings(
-                    context.user_data["sheet_id"], context.user_data["config"]
-                )
-                # Retrieve current settings
-                if setting_list == None:
-                    msg = f"{msg}Default Payment: None\nDefault Type: None\n"
-                else:
-                    msg = f"{msg}Default Payment: {setting_list[0]}\nDefault Type: {setting_list[1]}\n"
-                msg = f"{msg}Do you want to update it?"
-                update.callback_query.message.reply_text(
-                    msg, reply_markup=create_inline_markup(["Yes", "No"])
-                )
-                return CS.CONFIG_SETUP
+                msg = QUICK_TRANSPORT_TEXT
+                limit = QUICK_TRANSPORT_LIMIT
             elif reply == "Configure Quick Others":
                 context.user_data["config"] = EntryType.OTHERS
                 msg = QUICK_OTHER_TEXT
-                setting_list = gs.get_quick_add_others(context.user_data["sheet_id"])
-                keyboard_list = []
-                if setting_list == None:
-                    msg = f"{msg}No settings found\n"
-                else:
-                    for setting in setting_list:
-                        msg = f"{msg}{setting}\n"
-                if len(setting_list) < QUICK_OTHER_LIMIT:
-                    keyboard_list.append("Add new")
-                keyboard_list.append("Cancel")
-                update.callback_query.message.reply_text(
-                    msg, reply_markup=create_inline_markup(keyboard_list)
-                )
-                return CS.CONFIG_SETUP
+                limit = QUICK_OTHER_LIMIT
+
+            setting_list = gs.get_quick_add_list(
+                context.user_data["sheet_id"], context.user_data["config"]
+            )
+            keyboard_list = []
+            if setting_list == None:
+                msg = f"{msg}No settings found\n"
+            else:
+                for setting in setting_list:
+                    msg = f"{msg}{setting}\n"
+            if len(setting_list) < limit:
+                keyboard_list.append("Add new")
+            keyboard_list.append("Cancel")
+            update.callback_query.message.reply_text(
+                msg, reply_markup=create_inline_markup(keyboard_list)
+            )
+            return CS.CONFIG_SETUP
         except Exception as e:
             update.callback_query.message.reply_text(ERROR_TEXT)
             return ConversationHandler.END
@@ -550,13 +545,24 @@ def add_transport(update, context):
         update.message.reply_text(QUICK_SETUP_TRANSPORT)
         return ConversationHandler.END
     else:
-        context.user_data["payment"] = setting_list[0]
-        context.user_data["category"] = setting_list[1]
-        update.message.reply_text(
-            f"Quick Add Transport\nDefault Payment: {setting_list[0]}\nDefault Type: {setting_list[1]}"
-            + "\n\nPlease enter as follow: [price],[start],[end]\n e.g. 2.11, Home, Work"
+        setting_list = gs.get_quick_add_list(
+            context.user_data["sheet_id"], context.user_data["entry_type"]
         )
-    return CS.QUICK_ADD
+        if len(setting_list) == 1:
+            payment, category = setting_list[0].split(",")
+            context.user_data["payment"] = payment
+            context.user_data["category"] = category
+            update.message.reply_text(
+                f"Quick Add Transport\nDefault Payment: {payment}\nDefault Type: {category}"
+                + "\n\nPlease enter as follow: [price],[start],[end]\n e.g. 2.11, Home, Work"
+            )
+            return CS.QUICK_ADD
+        else:
+            update.message.reply_text(
+                "Quick Add Transport, please choose your category.",
+                reply_markup=create_inline_markup(setting_list),
+            )
+            return CS.QUICK_ADD_TRANSPORT
 
 
 def add_others(update, context):
@@ -575,7 +581,9 @@ def add_others(update, context):
         update.message.reply_text(QUICK_SETUP_OTHER)
         return ConversationHandler.END
     else:
-        setting_list = gs.get_quick_add_others(context.user_data["sheet_id"])
+        setting_list = gs.get_quick_add_list(
+            context.user_data["sheet_id"], context.user_data["entry_type"]
+        )
         update.message.reply_text(
             "Quick Add Others, please choose your category.",
             reply_markup=create_inline_markup(setting_list),
@@ -591,6 +599,17 @@ def quick_add_category(update, context) -> int:
         f'Quick Add Others\nDefault Payment: {context.user_data["payment"]}\nDefault Type: {context.user_data["category"]}'
         + "\n\nPlease enter as follow: [price],[remarks]\n e.g. 19.99, New shirt",
         reply_markup=None,
+    )
+    return CS.QUICK_ADD
+
+
+def quick_add_transport(update, context) -> int:
+    reply = update.callback_query.data
+    context.user_data["payment"], context.user_data["category"] = reply.split(",")
+    update.callback_query.answer()
+    update.callback_query.edit_message_text(
+        f'Quick Add Transport\nDefault Payment: {context.user_data["payment"]}\nDefault Type: {context.user_data["category"]}'
+        + "\n\nPlease enter as follow: [price],[start],[end]\n e.g. 2.11, Home, Work"
     )
     return CS.QUICK_ADD
 
@@ -800,6 +819,7 @@ def setup_handlers(dispatcher):
     quick_add_states = {
         CS.QUICK_ADD: [MessageHandler(Filters.text & ~Filters.command, quick_add)],
         CS.QUICK_ADD_CATEGORY: [CallbackQueryHandler(quick_add_category)],
+        CS.QUICK_ADD_TRANSPORT: [CallbackQueryHandler(quick_add_transport)],
     }
 
     # Retrieve transaction-related states and handlers

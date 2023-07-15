@@ -1,24 +1,22 @@
 import os
 
 GOOGLE_API_EMAIL = os.getenv("GOOGLE_API_EMAIL")
-
+GOOGLE_TEMPLATE = "https://docs.google.com/spreadsheets/d/1-XVdaeq1qqnLqAttGGzki6NkavqpkKs1n6Elz4GDC2I/edit?usp=sharing"
 SETUP_TEXT = (
     "Please set up your Google sheet by following the steps below.\n\n"
-    + "1. Go over to https://docs.google.com/spreadsheets/d/1dJgJk7YUoR0nYjNa_lgrMxpz-MehOo4SyfRitlasQo8/edit#gid=861838157\n"
+    + f"1. Head over to <a href='{GOOGLE_TEMPLATE}'>Expense Tracker Template</a>\n"
     + "2. Go to File > Make a copy\n"
-    + "3. Go to File > Share > Share with others\n"
-    + "4. Add "
+    + "3. Edit the Dropdown sheet accordingly\n"
+    + "4. Go to File > Share > Share with others\n"
+    + "5. Add "
     + str(GOOGLE_API_EMAIL)
     + " as an editor\n"
-    + "5. Copy your Google Sheet URL and send it over\n"
+    + "6. Copy your entire Google Sheet URL and send it over\n"
     + "Example: https://docs.google.com/spreadsheets/d/abcd1234/edit\n"
-    + "6. Edit the Dropdown sheet accordingly\n"
 )
 ERROR_TEXT = "There seems to be an error, please try again later."
 SUCCESS_LINK_TEXT = "Google sheet successfully linked! Please proceed to configure your Dropdown sheet.\nOnce completed, type /addentry to add your first entry!"
-GSHEET_ERROR_TEXT = (
-    "There seems to be an error linking your google sheet, please try again later."
-)
+GSHEET_ERROR_TEXT = f"There seems to be an error linking your google sheet, have you shared your Google Sheet with {GOOGLE_API_EMAIL} yet?"
 GSHEET_WRONG_TEXT = (
     "That doesn't seem like a Google sheet link, are you sure? Try sending again."
 )
@@ -41,8 +39,10 @@ BACK_TEXT = "<< Back"
 
 QUICK_SETUP_TRANSPORT = "You have not set up your quick add settings for transport yet, please do so by typing /config"
 QUICK_SETUP_OTHER = "You have not set up your quick add settings for others yet, please do so by typing /config"
-QUICK_OTHER_LIMIT = 5  # max i can go is 10, but testing with 5 first
+QUICK_OTHER_LIMIT = 5
+QUICK_TRANSPORT_LIMIT = 3
 QUICK_OTHER_TEXT = f'This is your current Others settings.\nClick on "Add new" to add a new one (max {QUICK_OTHER_LIMIT}).\nIf you wish to update, you will have to do so manually in the "Tracker" sheet.\n\nPayment, Category\n'
+QUICK_TRANSPORT_TEXT = f'This is your current Transport settings.\nClick on "Add new" to add a new one (max {QUICK_TRANSPORT_LIMIT}).\nIf you wish to update, you will have to do so manually in the "Tracker" sheet.\n\nPayment, Category\n'
 
 HELP_TEXT = (
     "To get started, please type /start\n"
