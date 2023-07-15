@@ -84,3 +84,8 @@
 
 ### For Developer 🧑‍💻
 - Remove firebase codes
+
+
+## Version 2.1.4 - Date 16 July 2023
+### Bug Fix 🛠️
+- Added end conversation handler for get day transaction

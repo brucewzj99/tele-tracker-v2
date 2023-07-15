@@ -685,6 +685,7 @@ def handle_get_transaction(update, context):
             return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
+        return ConversationHandler.END
 
 
 def handle_get_overall(update, context):
@@ -720,6 +721,7 @@ def handle_get_overall(update, context):
             return CS.HANDLE_GET_OVERALL
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
+        return ConversationHandler.END
 
 
 def add_income(update, context):
