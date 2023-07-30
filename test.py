@@ -28,4 +28,7 @@ setup_handlers(dispatcher)
 if __name__ == "__main__":
     public_url = ngrok.connect(5000, "http").public_url
     updater.bot.set_webhook(url=f"{public_url}/webhook")
+    print("#" * 50)
+    print(f"# Bot is running at @{updater.bot.get_me().username} #")
+    print("#" * 50)
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
