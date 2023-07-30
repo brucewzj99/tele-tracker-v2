@@ -157,7 +157,10 @@ def get_trackers(sheet_id):
         .execute()
     )
     values = result.get("values", [])
-    return values[0]
+    if values:
+        return values[0]
+    else:
+        return
 
 
 def update_rows(sheet_id, day, new_row, first_row):

@@ -97,8 +97,35 @@ def set_up(update, context) -> int:
             current_datetime = dt.datetime.now(timezone)
             day = current_datetime.day
             month = current_datetime.strftime("%b")
-            gs.update_rows(sheet_id, day, 4, 5)  # New users start from row 5
-            gs.create_date(sheet_id, day, month, 5)
+
+            # get tracker data to check if got input
+            trackers = gs.get_trackers(sheet_id)
+            if trackers:  # If got input
+                day_tracker = int(trackers[0])
+                first_row = int(trackers[3])
+                if day_tracker == day:
+                    pass
+                elif day_tracker < day:
+                    prev_month = (current_datetime - dt.timedelta(days=1)).strftime(
+                        "%b"
+                    )
+                    gs.update_prev_day(sheet_id, prev_month, first_row)
+                    new_row = gs.get_new_row(sheet_id, month)
+                    first_row = new_row + 1
+                    gs.update_rows(sheet_id, day, new_row, first_row)
+                    gs.create_date(sheet_id, day, month, first_row)
+                elif day == 1:
+                    new_row = 4
+                    first_row = 5
+                    gs.update_rows(sheet_id, day, new_row, first_row)
+                    gs.create_date(sheet_id, day, month, first_row)
+            else:  # New sheet
+                new_row = 4
+                first_row = 5
+                gs.update_rows(
+                    sheet_id, day, new_row, first_row
+                )  # New users start from row 5
+            gs.create_date(sheet_id, day, month, first_row)
             update.message.reply_text(SUCCESS_LINK_TEXT)
             return ConversationHandler.END
         except Exception as e:
