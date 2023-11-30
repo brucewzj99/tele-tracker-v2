@@ -58,7 +58,7 @@ HELP_TEXT = (
     + "\nTo report bugs, please create a issue at https://github.com/brucewzj99/tele-tracker-v2/issues or contact me @bruceeew on Telegram"
 )
 
-GET_TRANSACTION_TEXT = "Please specify the date and month you wish to retrieve from in this format: DD MMM\ne.g 16 Mar\nor use /cancel to exit"
+GET_TRANSACTION_TEXT = "Please specify the date and month you wish to retrieve from in this format: DD MMM\ne.g 16 Mar\n\nUse 'tdy' to retrieve the transacation for today \nor use /cancel to exit"
 GET_OVERALL_TEXT = "Please specify the month you wish to retrieve your overall transaction in this format: MMM\ne.g Mar\nor use /cancel to exit"
 
 ADD_INCOME_TEXT = "Add income\nPlease state your income followed by any remarks (optional): [income],[remarks]\ne.g. 2000, Something"

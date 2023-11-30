@@ -690,6 +690,8 @@ def handle_get_transaction(update, context):
     reply = update.message.text
     msg = ""
     try:
+        if reply.lower() == "tdy":
+            reply = dt.datetime.now(timezone).strftime("%d %b")
         if check_date_format(reply):
             day, month = reply.split(" ")
             total_spend, transport_values, other_values = gs.get_day_transaction(
