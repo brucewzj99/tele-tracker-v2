@@ -411,6 +411,11 @@ def category(update, context) -> int:
                 update.callback_query.edit_message_text(
                     f"Category type: {reply}", reply_markup=None
                 )
+                payment_list = get_payment_text(sheet_id)
+                update.callback_query.message.reply_text(
+                    DEFAULT_PAYMENT_TEXT,
+                    reply_markup=create_inline_markup(payment_list),
+                )
                 return CS.PAYMENT
     except Exception as e:
         update.callback_query.reply_text(ERROR_TEXT)
@@ -457,6 +462,14 @@ def payment(update, context) -> int:
                 DEFAULT_PAYMENT_TEXT, reply_markup=create_inline_markup(sub_markup_list)
             )
             return CS.SUBPAYMENT
+        # This won't be called as there will always be a subpayment, but just in case
+        else:
+            update.callback_query.edit_message_text(
+                f'Payment type: {context.user_data["payment"]}', reply_markup=None
+            )
+            log_transaction(context.user_data, update)
+            update.callback_query.message.reply_text("Transaction logged.")
+            return ConversationHandler.END
     except Exception as e:
         update.callback_query.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
@@ -514,12 +527,13 @@ def log_transaction(user_data, update):
     if day_tracker != day:
         msg = f"New entry for {day} {month}"
         prev_month = month
-        if day == 1:
+        # this should fix the bug regarding if first day of month not keyed in, but not tested
+        if day == 1 | day < day_tracker:
             prev_month = (current_datetime - dt.timedelta(days=1)).strftime("%b")
         # update prev day
         msg = f"{msg}\nCreating sum for day {day_tracker}"
         gs.update_prev_day(sheet_id, prev_month, first_row)
-        if day == 1:
+        if day == 1 | day < day_tracker:
             new_row = 4
             first_row = 5
             gs.update_rows(sheet_id, 1, new_row, first_row)
