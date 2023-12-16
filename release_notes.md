@@ -1,4 +1,15 @@
 # Release Notes
+## Version 2.1.6 - Date 16 Dec 2023
+### Bug Fix 🛠️
+- Fix empty subcategory and subpayment bug
+
+### New Features 🆕
+- Added a new shortcode to retrieve transaction for today `/today`
+
+### For Developer 🧑‍💻
+- Mini refactor of code, added utils folder to store helper functions
+- Added a new test_polling.py file to test polling locally
+- Rename test.py to test_webhook.py for webhook testing
 
 ## Version 2.1.5 - Date 30 July 2023
 ### Bug Fix 🛠️
