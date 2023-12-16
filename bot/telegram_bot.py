@@ -935,7 +935,7 @@ def setup_handlers(dispatcher):
             CommandHandler("addincome", add_income),
             CommandHandler("getdaytransaction", get_day_transaction),
             CommandHandler("getoverall", get_overall),
-            CommandHandler("backlog", backlog),
+            CommandHandler("backdate", backlog),
         ],
         states={
             CS.SET_UP: [MessageHandler(Filters.text & ~Filters.command, set_up)],
