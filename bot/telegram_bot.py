@@ -85,7 +85,7 @@ def set_up(update, context) -> int:
                         "%b"
                     )
                     gs.update_prev_day(sheet_id, prev_month, first_row)
-                    new_row = gs.get_new_row(sheet_id, month)
+                    new_row = gs.get_last_entered_row(sheet_id, month)
                     first_row = new_row + 1
                     gs.update_rows(sheet_id, day, new_row, first_row)
                     gs.create_date(sheet_id, day, month, first_row)
@@ -442,7 +442,10 @@ def payment(update, context) -> int:
             update.callback_query.edit_message_text(
                 f'Payment type: {context.user_data["payment"]}', reply_markup=None
             )
-            log_transaction(context.user_data, update)
+            if context.user_data["backlog"]:
+                backlog_transaction(context.user_data, update)
+            else:
+                log_transaction(context.user_data, update)
             update.callback_query.message.reply_text("Transaction logged.")
             return ConversationHandler.END
     except Exception as e:
@@ -465,7 +468,10 @@ def subpayment(update, context) -> int:
         update.callback_query.edit_message_text(
             f'Payment type: {context.user_data["payment"]}', reply_markup=None
         )
-        log_transaction(context.user_data, update)
+        if context.user_data["backlog"]:
+            backlog_transaction(context.user_data, update)
+        else:
+            log_transaction(context.user_data, update)
         update.callback_query.message.reply_text("Transaction logged.")
         return ConversationHandler.END
 
@@ -513,7 +519,7 @@ def log_transaction(user_data, update):
             first_row = 5
             gs.update_rows(sheet_id, 1, new_row, first_row)
         else:
-            new_row = gs.get_new_row(sheet_id, month)
+            new_row = gs.get_last_entered_row(sheet_id, month)
             first_row = new_row + 1
             gs.update_rows(sheet_id, day, new_row, first_row)
         if update.callback_query and update.callback_query.message:
@@ -540,8 +546,35 @@ def log_transaction(user_data, update):
         gs.create_entry(sheet_id, month, other_row_tracker, row_data)
 
 
+def backlog_transaction(user_data, update):
+    sheet_id = user_data["sheet_id"]
+
+    backlog_day = user_data["backlog_day"]
+    backlog_month = user_data["backlog_month"]
+
+    # datatime data
+    current_datetime = dt.datetime.now(timezone)
+    month = current_datetime.strftime("%b")
+
+    # if backlog month is current month, need to move all one down
+    if backlog_month.title() == month:
+        gs.row_incremental_all(sheet_id)
+
+    
+    # user input data
+    entry_type = user_data["entry_type"]
+    payment = user_data["payment"]
+    price = user_data["price"]
+    category = user_data["category"]
+    remarks = user_data["remarks"]
+    row_data = [entry_type, price, remarks, category, payment]
+
+    # create backlog entry
+    gs.create_backlog_entry(sheet_id, backlog_day, backlog_month, row_data)
+
 def cancel(update, context):
     update.message.reply_text(END_TEXT, reply_markup=None)
+    context.user_data.clear()
     return ConversationHandler.END
 
 
@@ -686,6 +719,12 @@ def handle_get_transaction(update, context):
             total_spend, transport_values, other_values = gs.get_day_transaction(
                 sheet_id, month, day
             )
+            if total_spend == None and transport_values == None and other_values == None:
+                update.message.reply_text(
+                    f"No transaction found for {day} {month}", reply_markup=None
+                )
+                return ConversationHandler.END
+            
             if not total_spend:
                 total_spend = "To be determine"
             else:
@@ -812,6 +851,34 @@ def cpf(update, context) -> int:
         update.callback_query.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
 
+def backlog(update, context) -> int:
+    context.user_data.clear()
+    update.message.reply_text(BACKLOG_DATE_TEXT)
+    context.user_data["backlog"] = True
+    return CS.ADD_BACKLOG_ENTRY
+
+def add_backlog_entry(update, context) -> int:
+    reply = update.message.text
+    if utils.check_date_format(reply):
+        if reply == dt.datetime.now(timezone).strftime("%d %b").lstrip("0"):
+            context.user_data["backlog"] = False
+        else:
+            day, month = reply.split(" ")
+            context.user_data["backlog_day"] = day
+            context.user_data["backlog_month"] = month
+    else:
+        update.message.reply_text(BACKLOG_DATE_TEXT)
+        return CS.ADD_BACKLOG_ENTRY
+    
+    telegram_id = update.effective_user.id
+    context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id)
+    update.message.reply_text(
+        ENTRY_TYPE_TEXT,
+        reply_markup=utils.create_inline_markup(
+            [entry_type.value for entry_type in EntryType]
+        ),
+    )
+    return CS.ENTRY
 
 def setup_handlers(dispatcher):
     # Configuration-related states and handlers
@@ -833,6 +900,7 @@ def setup_handlers(dispatcher):
         CS.SUBCATEGORY: [CallbackQueryHandler(subcategory)],
         CS.PAYMENT: [CallbackQueryHandler(payment)],
         CS.SUBPAYMENT: [CallbackQueryHandler(subpayment)],
+        CS.ADD_BACKLOG_ENTRY: [MessageHandler(Filters.text & ~Filters.command, add_backlog_entry)],
     }
 
     # Quick add-related states and handlers
@@ -867,6 +935,7 @@ def setup_handlers(dispatcher):
             CommandHandler("addincome", add_income),
             CommandHandler("getdaytransaction", get_day_transaction),
             CommandHandler("getoverall", get_overall),
+            CommandHandler("backlog", backlog),
         ],
         states={
             CS.SET_UP: [MessageHandler(Filters.text & ~Filters.command, set_up)],
