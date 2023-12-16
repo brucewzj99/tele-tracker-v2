@@ -298,7 +298,18 @@ def config_subpayment(update, context) -> int:
 
 
 def add_entry(update, context):
-    context.user_data.clear()
+    print(context.user_data)
+    if context.user_data.get("backlog"):
+        reply = update.callback_query.data
+        if utils.check_date_format(reply):
+            day, month = reply.split(" ")
+        else:
+            update.callback_query.message.reply_text(
+                BACKLOG_DATE_TEXT
+            )
+            return add_entry(update, context)
+    else:
+        context.user_data.clear()
     telegram_id = update.effective_user.id
     context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id)
     update.message.reply_text(
@@ -812,6 +823,15 @@ def cpf(update, context) -> int:
         update.callback_query.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
 
+def backlog(update, context) -> int:
+    context.user_data.clear()
+    telegram_id = update.effective_user.id
+    context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id)
+    update.message.reply_text(
+        BACKLOG_DATE_TEXT
+    )
+    context.user_data["backlog"] = True
+    return add_entry(update, context)
 
 def setup_handlers(dispatcher):
     # Configuration-related states and handlers
@@ -867,6 +887,7 @@ def setup_handlers(dispatcher):
             CommandHandler("addincome", add_income),
             CommandHandler("getdaytransaction", get_day_transaction),
             CommandHandler("getoverall", get_overall),
+            CommandHandler("backlog", backlog),
         ],
         states={
             CS.SET_UP: [MessageHandler(Filters.text & ~Filters.command, set_up)],

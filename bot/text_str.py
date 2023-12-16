@@ -68,3 +68,5 @@ ADD_INCOME_RETRY_TEXT = (
 CHOOSE_INCOME_SOURCE_TEXT = "Please choose your income source"
 CPF_TEXT = "Is there CPF?"
 INCOME_LIMIT_TEXT = "You have exceed the number of income allowed! (max 6)"
+
+BACKLOG_DATE_TEXT = "Please enter the date of the entry in this format: DD MMM\ne.g 16 Mar"
