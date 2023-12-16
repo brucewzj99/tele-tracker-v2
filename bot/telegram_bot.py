@@ -15,36 +15,11 @@ from warnings import filterwarnings
 from bot.text_str import *
 from bot.common import EntryType
 from bot.common import ConversationState as CS
-import bot.google_sheet as gs
-import bot.firestore as db
+import bot.google_sheet_service as gs
+import bot.firestore_service as db
+import bot.utils as utils
 
 timezone = pytz.timezone("Asia/Singapore")
-
-
-def create_inline_markup(list):
-    keyboard_markup_list = []
-    for reply in list:
-        if reply:
-            keyboard_markup_list.append(
-                [InlineKeyboardButton(reply, callback_data=reply)]
-            )
-    return InlineKeyboardMarkup(keyboard_markup_list)
-
-
-def is_valid_price(price):
-    pattern = r"^-?\d{0,10}(\.\d{0,2})?$"
-    return bool(re.match(pattern, price))
-
-
-def check_date_format(date_string):
-    pattern = r"\b\d{1,2}\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b"
-    return bool(re.fullmatch(pattern, date_string, re.IGNORECASE))
-
-
-def check_month_format(month_string):
-    pattern = r"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$"
-    return bool(re.fullmatch(pattern, month_string, re.IGNORECASE))
-
 
 def get_category_text(sheet_id, entry_type):
     msg = ""
@@ -73,7 +48,7 @@ def start(update, context):
             link = f"https://docs.google.com/spreadsheets/d/{context.user_data['sheet_id']}/edit"
             update.message.reply_text(
                 f"Seems like you have already linked a Google sheet with us, do you want to link a different Google sheet with us?\n\n{link}",
-                reply_markup=create_inline_markup(["Yes", "No"]),
+                reply_markup=utils.create_inline_markup(["Yes", "No"]),
             )
             return CS.RESET_UP
         else:
@@ -158,7 +133,7 @@ def config(update, context):
         "Cancel",
     ]
     update.message.reply_text(
-        "How can i help you today?", reply_markup=create_inline_markup(list)
+        "How can i help you today?", reply_markup=utils.create_inline_markup(list)
     )
     return CS.CONFIG_HANDLER
 
@@ -197,7 +172,7 @@ def config_handler(update, context) -> int:
                 keyboard_list.append("Add new")
             keyboard_list.append("Cancel")
             update.callback_query.message.reply_text(
-                msg, reply_markup=create_inline_markup(keyboard_list)
+                msg, reply_markup=utils.create_inline_markup(keyboard_list)
             )
             return CS.CONFIG_SETUP
         except Exception as e:
@@ -216,7 +191,7 @@ def config_setup(update, context) -> int:
             )
             update.callback_query.message.edit_text(
                 f"Choose your default {config.value} type.",
-                reply_markup=create_inline_markup(markup_list),
+                reply_markup=utils.create_inline_markup(markup_list),
             )
             return CS.CONFIG_CATEGORY
     except Exception as e:
@@ -240,7 +215,7 @@ def config_category(update, context) -> int:
             )
             payment_list = gs.get_main_dropdown_value(sheet_id, "Payment")
             update.callback_query.message.reply_text(
-                DEFAULT_PAYMENT_TEXT, reply_markup=create_inline_markup(payment_list)
+                DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
             )
             return CS.CONFIG_PAYMENT
         elif config == EntryType.OTHERS:
@@ -249,7 +224,7 @@ def config_category(update, context) -> int:
                 sub_markup_list.pop(0)
                 update.callback_query.message.edit_text(
                     DEFAULT_SUBCATEGORY_TEXT,
-                    reply_markup=create_inline_markup(sub_markup_list),
+                    reply_markup=utils.create_inline_markup(sub_markup_list),
                 )
                 return CS.CONFIG_SUBCATEGORY
     except Exception as e:
@@ -271,7 +246,7 @@ def config_subcategory(update, context) -> int:
             reply_markup=None,
         )
         update.callback_query.message.reply_text(
-            DEFAULT_PAYMENT_TEXT, reply_markup=create_inline_markup(payment_list)
+            DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
         )
         return CS.CONFIG_PAYMENT
     except Exception as e:
@@ -289,7 +264,7 @@ def config_payment(update, context) -> int:
         if len(sub_markup_list) > 1:
             sub_markup_list.pop(0)
             update.callback_query.message.edit_text(
-                DEFAULT_PAYMENT_TEXT, reply_markup=create_inline_markup(sub_markup_list)
+                DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(sub_markup_list)
             )
             return CS.CONFIG_SUBPAYMENT
     except Exception as e:
@@ -328,7 +303,7 @@ def add_entry(update, context):
     context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id)
     update.message.reply_text(
         ENTRY_TYPE_TEXT,
-        reply_markup=create_inline_markup(
+        reply_markup=utils.create_inline_markup(
             [entry_type.value for entry_type in EntryType]
         ),
     )
@@ -346,7 +321,7 @@ def entry(update, context) -> int:
 
 def price(update, context) -> int:
     reply = update.message.text
-    if is_valid_price(reply):
+    if utils.is_valid_price(reply):
         context.user_data["price"] = reply
         entry_type = context.user_data["entry_type"]
         if entry_type == EntryType.TRANSPORT:
@@ -372,7 +347,7 @@ def remarks(update: Update, context) -> int:
             return CS.REMARKS
     msg, markup_list = get_category_text(sheet_id, entry_type)
     try:
-        update.message.reply_text(msg, reply_markup=create_inline_markup(markup_list))
+        update.message.reply_text(msg, reply_markup=utils.create_inline_markup(markup_list))
         return CS.CATEGORY
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
@@ -392,7 +367,7 @@ def category(update, context) -> int:
             context.user_data["category"] = f"{reply}"
             payment_list = get_payment_text(sheet_id)
             update.callback_query.message.reply_text(
-                DEFAULT_PAYMENT_TEXT, reply_markup=create_inline_markup(payment_list)
+                DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
             )
             return CS.PAYMENT
         elif entry_type == EntryType.OTHERS:
@@ -403,7 +378,7 @@ def category(update, context) -> int:
                 sub_markup_list.append(BACK_TEXT)
                 update.callback_query.message.edit_text(
                     DEFAULT_SUBCATEGORY_TEXT,
-                    reply_markup=create_inline_markup(sub_markup_list),
+                    reply_markup=utils.create_inline_markup(sub_markup_list),
                 )
                 return CS.SUBCATEGORY
             # This won't be called as there will always be a subcategory, but just in case
@@ -414,7 +389,7 @@ def category(update, context) -> int:
                 payment_list = get_payment_text(sheet_id)
                 update.callback_query.message.reply_text(
                     DEFAULT_PAYMENT_TEXT,
-                    reply_markup=create_inline_markup(payment_list),
+                    reply_markup=utils.create_inline_markup(payment_list),
                 )
                 return CS.PAYMENT
     except Exception as e:
@@ -430,7 +405,7 @@ def subcategory(update, context) -> int:
     if reply == BACK_TEXT:
         msg, markup_list = get_category_text(sheet_id, entry_type)
         update.callback_query.edit_message_text(
-            msg, reply_markup=create_inline_markup(markup_list)
+            msg, reply_markup=utils.create_inline_markup(markup_list)
         )
         return CS.CATEGORY
     try:
@@ -440,7 +415,7 @@ def subcategory(update, context) -> int:
         )
         payment_list = get_payment_text(sheet_id)
         update.callback_query.message.reply_text(
-            DEFAULT_PAYMENT_TEXT, reply_markup=create_inline_markup(payment_list)
+            DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
         )
         return CS.PAYMENT
     except Exception as e:
@@ -459,7 +434,7 @@ def payment(update, context) -> int:
             sub_markup_list.pop(0)
             sub_markup_list.append(BACK_TEXT)
             update.callback_query.message.edit_text(
-                DEFAULT_PAYMENT_TEXT, reply_markup=create_inline_markup(sub_markup_list)
+                DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(sub_markup_list)
             )
             return CS.SUBPAYMENT
         # This won't be called as there will always be a subpayment, but just in case
@@ -482,7 +457,7 @@ def subpayment(update, context) -> int:
     if reply == BACK_TEXT:
         payment_list = get_payment_text(sheet_id)
         update.callback_query.edit_message_text(
-            DEFAULT_PAYMENT_TEXT, reply_markup=create_inline_markup(payment_list)
+            DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
         )
         return CS.PAYMENT
     try:
@@ -601,7 +576,7 @@ def add_transport(update, context):
         else:
             update.message.reply_text(
                 "Quick Add Transport, please choose your category.",
-                reply_markup=create_inline_markup(setting_list),
+                reply_markup=utils.create_inline_markup(setting_list),
             )
             return CS.QUICK_ADD_TRANSPORT
 
@@ -627,7 +602,7 @@ def add_others(update, context):
         )
         update.message.reply_text(
             "Quick Add Others, please choose your category.",
-            reply_markup=create_inline_markup(setting_list),
+            reply_markup=utils.create_inline_markup(setting_list),
         )
     return CS.QUICK_ADD_CATEGORY
 
@@ -706,7 +681,7 @@ def handle_get_transaction(update, context):
     try:
         if reply.lower() == "tdy":
             reply = dt.datetime.now(timezone).strftime("%d %b").lstrip("0")
-        if check_date_format(reply):
+        if utils.check_date_format(reply):
             day, month = reply.split(" ")
             total_spend, transport_values, other_values = gs.get_day_transaction(
                 sheet_id, month, day
@@ -735,7 +710,7 @@ def handle_get_overall(update, context):
     sheet_id = context.user_data["sheet_id"]
     month = update.message.text
     try:
-        if check_month_format(month):
+        if utils.check_month_format(month):
             values = gs.get_overall(sheet_id, month)
 
             final_income = values[0]
@@ -786,7 +761,7 @@ def income(update, context) -> int:
     if "," in reply:
         income, remarks = reply.split(",")
     else:
-        if is_valid_price(income):
+        if utils.is_valid_price(income):
             income = reply
         else:
             update.message.reply_text(ADD_INCOME_RETRY_TEXT)
@@ -797,7 +772,7 @@ def income(update, context) -> int:
         sheet_id = context.user_data["sheet_id"]
         work_list = gs.get_work_place(sheet_id)
         update.message.reply_text(
-            CHOOSE_INCOME_SOURCE_TEXT, reply_markup=create_inline_markup(work_list)
+            CHOOSE_INCOME_SOURCE_TEXT, reply_markup=utils.create_inline_markup(work_list)
         )
         return CS.WORK_PLACE
     except Exception as e:
@@ -811,7 +786,7 @@ def work_place(update, context) -> int:
     update.callback_query.answer()
     update.callback_query.message.edit_text(f"Place: {place}", reply_markup=None)
     update.callback_query.message.reply_text(
-        CPF_TEXT, reply_markup=create_inline_markup(["Yes", "No"])
+        CPF_TEXT, reply_markup=utils.create_inline_markup(["Yes", "No"])
     )
     return CS.CPF
 
