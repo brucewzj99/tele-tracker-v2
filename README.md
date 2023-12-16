@@ -68,6 +68,8 @@ python3.9 test.py
 
 /addincome - Add Income Entry
 
+/backlog - Add backdated transaction
+
 /getdaytransaction - Retrieve transaction from dates
 
 /getoverall - Retrieve overall transaction for a month

@@ -33,4 +33,5 @@ class ConversationState(Enum):
         WORK_PLACE,
         CPF,
         BACKLOG,
-    ) = range(25)
+        ADD_BACKLOG_ENTRY,
+    ) = range(26)

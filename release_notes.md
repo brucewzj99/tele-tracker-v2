@@ -1,4 +1,8 @@
 # Release Notes
+## Version 2.1.7 - Date 16 Dec 2023
+### New Features 🆕
+- You can now add backdated transactions with `/backlog` command! 🎉
+
 ## Version 2.1.6 - Date 16 Dec 2023
 ### Bug Fix 🛠️
 - Fix empty subcategory and subpayment bug
