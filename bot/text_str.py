@@ -14,7 +14,7 @@ SETUP_TEXT = (
     + "6. Copy your entire Google Sheet URL and send it over\n"
     + "Example: https://docs.google.com/spreadsheets/d/abcd1234/edit\n"
 )
-ERROR_TEXT = "There seems to be an error, please try again later."
+ERROR_TEXT = "There seems to be an error, please try again later. If the problem persists, please contact report it at github.com/brucewzj99/tele-tracker-v2/issues"
 SUCCESS_LINK_TEXT = "Google sheet successfully linked! Please proceed to configure your Dropdown sheet.\nOnce completed, type /addentry to add your first entry!"
 GSHEET_ERROR_TEXT = f"There seems to be an error linking your google sheet, have you shared your Google Sheet with {GOOGLE_API_EMAIL} yet?"
 GSHEET_WRONG_TEXT = (
@@ -69,4 +69,6 @@ CHOOSE_INCOME_SOURCE_TEXT = "Please choose your income source"
 CPF_TEXT = "Is there CPF?"
 INCOME_LIMIT_TEXT = "You have exceed the number of income allowed! (max 6)"
 
-BACKLOG_DATE_TEXT = "Please enter the date of the entry in this format: DD MMM\ne.g 16 Mar"
+BACKLOG_DATE_TEXT = (
+    "Please enter the date of the entry in this format: DD MMM\ne.g 16 Mar"
+)
