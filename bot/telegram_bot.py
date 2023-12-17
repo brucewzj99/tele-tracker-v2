@@ -21,6 +21,7 @@ import bot.utils as utils
 
 timezone = pytz.timezone("Asia/Singapore")
 
+
 def get_category_text(sheet_id, entry_type):
     msg = ""
     markup_list = []
@@ -215,7 +216,8 @@ def config_category(update, context) -> int:
             )
             payment_list = gs.get_main_dropdown_value(sheet_id, "Payment")
             update.callback_query.message.reply_text(
-                DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
+                DEFAULT_PAYMENT_TEXT,
+                reply_markup=utils.create_inline_markup(payment_list),
             )
             return CS.CONFIG_PAYMENT
         elif config == EntryType.OTHERS:
@@ -264,7 +266,8 @@ def config_payment(update, context) -> int:
         if len(sub_markup_list) > 1:
             sub_markup_list.pop(0)
             update.callback_query.message.edit_text(
-                DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(sub_markup_list)
+                DEFAULT_PAYMENT_TEXT,
+                reply_markup=utils.create_inline_markup(sub_markup_list),
             )
             return CS.CONFIG_SUBPAYMENT
     except Exception as e:
@@ -347,7 +350,9 @@ def remarks(update: Update, context) -> int:
             return CS.REMARKS
     msg, markup_list = get_category_text(sheet_id, entry_type)
     try:
-        update.message.reply_text(msg, reply_markup=utils.create_inline_markup(markup_list))
+        update.message.reply_text(
+            msg, reply_markup=utils.create_inline_markup(markup_list)
+        )
         return CS.CATEGORY
     except Exception as e:
         update.message.reply_text(ERROR_TEXT)
@@ -367,7 +372,8 @@ def category(update, context) -> int:
             context.user_data["category"] = f"{reply}"
             payment_list = get_payment_text(sheet_id)
             update.callback_query.message.reply_text(
-                DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
+                DEFAULT_PAYMENT_TEXT,
+                reply_markup=utils.create_inline_markup(payment_list),
             )
             return CS.PAYMENT
         elif entry_type == EntryType.OTHERS:
@@ -434,7 +440,8 @@ def payment(update, context) -> int:
             sub_markup_list.pop(0)
             sub_markup_list.append(BACK_TEXT)
             update.callback_query.message.edit_text(
-                DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(sub_markup_list)
+                DEFAULT_PAYMENT_TEXT,
+                reply_markup=utils.create_inline_markup(sub_markup_list),
             )
             return CS.SUBPAYMENT
         # This won't be called as there will always be a subpayment, but just in case
@@ -442,7 +449,7 @@ def payment(update, context) -> int:
             update.callback_query.edit_message_text(
                 f'Payment type: {context.user_data["payment"]}', reply_markup=None
             )
-            if context.user_data["backlog"]:
+            if context.user_data.get("backlog"):
                 backlog_transaction(context.user_data, update)
             else:
                 log_transaction(context.user_data, update)
@@ -468,7 +475,7 @@ def subpayment(update, context) -> int:
         update.callback_query.edit_message_text(
             f'Payment type: {context.user_data["payment"]}', reply_markup=None
         )
-        if context.user_data["backlog"]:
+        if context.user_data.get("backlog"):
             backlog_transaction(context.user_data, update)
         else:
             log_transaction(context.user_data, update)
@@ -560,7 +567,6 @@ def backlog_transaction(user_data, update):
     if backlog_month.title() == month:
         gs.row_incremental_all(sheet_id)
 
-    
     # user input data
     entry_type = user_data["entry_type"]
     payment = user_data["payment"]
@@ -571,6 +577,7 @@ def backlog_transaction(user_data, update):
 
     # create backlog entry
     gs.create_backlog_entry(sheet_id, backlog_day, backlog_month, row_data)
+
 
 def cancel(update, context):
     update.message.reply_text(END_TEXT, reply_markup=None)
@@ -719,12 +726,16 @@ def handle_get_transaction(update, context):
             total_spend, transport_values, other_values = gs.get_day_transaction(
                 sheet_id, month, day
             )
-            if total_spend == None and transport_values == None and other_values == None:
+            if (
+                total_spend == None
+                and transport_values == None
+                and other_values == None
+            ):
                 update.message.reply_text(
                     f"No transaction found for {day} {month}", reply_markup=None
                 )
                 return ConversationHandler.END
-            
+
             if not total_spend:
                 total_spend = "To be determine"
             else:
@@ -811,7 +822,8 @@ def income(update, context) -> int:
         sheet_id = context.user_data["sheet_id"]
         work_list = gs.get_work_place(sheet_id)
         update.message.reply_text(
-            CHOOSE_INCOME_SOURCE_TEXT, reply_markup=utils.create_inline_markup(work_list)
+            CHOOSE_INCOME_SOURCE_TEXT,
+            reply_markup=utils.create_inline_markup(work_list),
         )
         return CS.WORK_PLACE
     except Exception as e:
@@ -851,11 +863,13 @@ def cpf(update, context) -> int:
         update.callback_query.message.reply_text(ERROR_TEXT)
         return ConversationHandler.END
 
+
 def backlog(update, context) -> int:
     context.user_data.clear()
     update.message.reply_text(BACKLOG_DATE_TEXT)
     context.user_data["backlog"] = True
     return CS.ADD_BACKLOG_ENTRY
+
 
 def add_backlog_entry(update, context) -> int:
     reply = update.message.text
@@ -869,7 +883,7 @@ def add_backlog_entry(update, context) -> int:
     else:
         update.message.reply_text(BACKLOG_DATE_TEXT)
         return CS.ADD_BACKLOG_ENTRY
-    
+
     telegram_id = update.effective_user.id
     context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id)
     update.message.reply_text(
@@ -879,6 +893,7 @@ def add_backlog_entry(update, context) -> int:
         ),
     )
     return CS.ENTRY
+
 
 def setup_handlers(dispatcher):
     # Configuration-related states and handlers
@@ -900,7 +915,9 @@ def setup_handlers(dispatcher):
         CS.SUBCATEGORY: [CallbackQueryHandler(subcategory)],
         CS.PAYMENT: [CallbackQueryHandler(payment)],
         CS.SUBPAYMENT: [CallbackQueryHandler(subpayment)],
-        CS.ADD_BACKLOG_ENTRY: [MessageHandler(Filters.text & ~Filters.command, add_backlog_entry)],
+        CS.ADD_BACKLOG_ENTRY: [
+            MessageHandler(Filters.text & ~Filters.command, add_backlog_entry)
+        ],
     }
 
     # Quick add-related states and handlers
