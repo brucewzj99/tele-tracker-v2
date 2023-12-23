@@ -47,6 +47,7 @@ DATABASE_URL=firebase_url
 GOOGLE_API_EMAIL=google_api_email
 FIREBASE_JSON=service_account_key
 GOOGLE_JSON=service_account_key
+MASTER_TELE_ID=your_telegram_id
 ```
 
 ### Step 3
@@ -77,6 +78,8 @@ python3.9 test.py
 /cancel - Cancel Conversation
 
 /help - Show Help
+
+/notifyall - Send message to all users (requires your telegram id/only for admin)
 
 ## Contributing
 If you want to contribute or have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue or work on issues that are currently open.
