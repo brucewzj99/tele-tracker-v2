@@ -20,6 +20,7 @@ import bot.firestore_service as db
 import bot.utils as utils
 
 timezone = pytz.timezone("Asia/Singapore")
+MASTER_TELE_ID = os.environ.get("MASTER_TELE_ID")
 
 
 def get_category_text(sheet_id, entry_type):
@@ -895,6 +896,65 @@ def add_backlog_entry(update, context) -> int:
     return CS.ENTRY
 
 
+def send_new_feature_message(context, new_feature_message):
+    users = db.get_all_user_id()
+    no_of_users = 0
+    errors = []
+
+    for user_id in users:
+        try:
+            context.bot.send_message(chat_id=user_id, text=new_feature_message)
+            no_of_users += 1
+        except Exception as e:
+            try:
+                chat = context.bot.get_chat(chat_id=user_id)
+                username = chat.username if chat.username else "?"
+            except Exception:
+                username = "?"
+
+            errors.append(f"Username @{username} (ID: {user_id}): {e}")
+
+    error_message = "\n".join(errors)
+    return no_of_users, error_message
+
+
+def notify_all(update, context):
+    if str(update.effective_user.id) == MASTER_TELE_ID:
+        new_feature_message = update.message.text.partition(" ")[2]
+        if not new_feature_message:
+            update.message.reply_text("Please provide a message to send.")
+            return
+
+        keyboard = [
+            [
+                InlineKeyboardButton("Confirm Send", callback_data="confirm_send"),
+                InlineKeyboardButton("Cancel", callback_data="cancel_send"),
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        update.message.reply_text(
+            f"Preview:\n{new_feature_message}", reply_markup=reply_markup
+        )
+    else:
+        update.message.reply_text("You are not authorized to use this command.")
+
+
+def notify_preview(update, context):
+    query = update.callback_query
+    query.answer()
+    if query.data == "confirm_send":
+        new_feature_message = query.message.text.partition("\n")[2]
+        no_of_users, error_message = send_new_feature_message(
+            context, new_feature_message
+        )
+        response = f"Message sent to {no_of_users} users."
+        if error_message:
+            response += f"\nErrors:\n{error_message}"
+        query.edit_message_text(text=response)
+    elif query.data == "cancel_send":
+        query.edit_message_text(text="Message sending cancelled.")
+
+
 def setup_handlers(dispatcher):
     # Configuration-related states and handlers
     config_states = {
@@ -965,8 +1025,13 @@ def setup_handlers(dispatcher):
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
-
     dispatcher.add_handler(conv_handler)
 
     help_handler = CommandHandler("help", help)
     dispatcher.add_handler(help_handler)
+
+    # Notify all users (admin)
+    notify_all_handler = CommandHandler("notifyall", notify_all)
+
+    dispatcher.add_handler(CallbackQueryHandler(notify_preview))
+    dispatcher.add_handler(notify_all_handler)
