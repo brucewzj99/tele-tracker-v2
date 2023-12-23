@@ -1,7 +1,7 @@
 import os
 
 GOOGLE_API_EMAIL = os.getenv("GOOGLE_API_EMAIL")
-GOOGLE_TEMPLATE = "https://docs.google.com/spreadsheets/d/1-XVdaeq1qqnLqAttGGzki6NkavqpkKs1n6Elz4GDC2I/edit?usp=sharing"
+GOOGLE_TEMPLATE = "http://tinyurl.com/ymm-2024-expense-sheet"
 SETUP_TEXT = (
     "Please set up your Google sheet by following the steps below.\n\n"
     + f"1. Head over to <a href='{GOOGLE_TEMPLATE}'>Expense Tracker Template</a>\n"
