@@ -4,10 +4,13 @@ import os
 from bot.telegram_bot import setup_handlers
 
 # Enable logging and set the file to write logs to
-log_file = 'telegram_bot.log'
-logging.basicConfig(filename=log_file, filemode='a',
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+log_file = "telegram_bot.log"
+logging.basicConfig(
+    filename=log_file,
+    filemode="a",
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
 
 logger = logging.getLogger(__name__)
 

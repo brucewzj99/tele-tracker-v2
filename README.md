@@ -53,7 +53,9 @@ MASTER_TELE_ID=your_telegram_id
 ### Step 3
 * Proceed to project directory and run:
 ``` python
-python3.9 test.py
+python3.9 test_polling.py
+OR
+python3.9 test_webhook.py
 ```
 
 ## Usage
