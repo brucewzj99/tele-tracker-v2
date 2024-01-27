@@ -1,4 +1,8 @@
 # Release Notes
+## Version 2.2.0 - Date 27 Jan 2024
+### Bug Fix 🛠️
+- Fix backlog bug
+
 ## Version 2.1.9 - Date 23 Dec 2023
 ### For Developer 🧑‍💻
 - Push features message to all users using `/notifyall` command (requires your telegram id)

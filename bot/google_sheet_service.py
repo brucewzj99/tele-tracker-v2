@@ -153,14 +153,16 @@ def create_entry(spreadsheet_id, month, row_tracker, row_data):
 
 
 def get_sheet_id_by_title(spreadsheet_id, title_to_find):
-    sheet_metadata = sheets_api.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
-    sheets = sheet_metadata.get('sheets', '')
-    
+    sheet_metadata = (
+        sheets_api.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
+    )
+    sheets = sheet_metadata.get("sheets", "")
+
     for sheet in sheets:
         title = sheet.get("properties", {}).get("title")
         if title == title_to_find:
             return sheet.get("properties", {}).get("sheetId")
-    
+
     return None
 
 
@@ -171,7 +173,9 @@ def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
     category = row_data[3].strip()
     payment = row_data[4].strip()
 
-    day_first_entry_index = get_day_first_entry_index(spreadsheet_id, backlog_month, backlog_day)
+    day_first_entry_index = get_day_first_entry_index(
+        spreadsheet_id, backlog_month, backlog_day
+    )
     row_to_move = int(get_first_row_to_move(spreadsheet_id, backlog_month, backlog_day))
     last_row_to_move = int(get_last_entered_row(spreadsheet_id, backlog_month))
     new_entry_row = row_to_move
@@ -185,33 +189,31 @@ def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
                 "copyPaste": {
                     "source": {
                         "sheetId": sheet_id,
-                        "startRowIndex": row_to_move - 1, 
-                        "endRowIndex": last_row_to_move, 
-                        "startColumnIndex": start_column_index,  
-                        "endColumnIndex": end_column_index  
+                        "startRowIndex": row_to_move - 1,
+                        "endRowIndex": last_row_to_move,
+                        "startColumnIndex": start_column_index,
+                        "endColumnIndex": end_column_index,
                     },
                     "destination": {
                         "sheetId": sheet_id,
-                        "startRowIndex": row_to_move, 
-                        "endRowIndex": last_row_to_move + 1, 
-                        "startColumnIndex": start_column_index,  
-                        "endColumnIndex": end_column_index  
+                        "startRowIndex": row_to_move,
+                        "endRowIndex": last_row_to_move + 1,
+                        "startColumnIndex": start_column_index,
+                        "endColumnIndex": end_column_index,
                     },
                     "pasteType": "PASTE_NORMAL",
-                    "pasteOrientation": "NORMAL"
+                    "pasteOrientation": "NORMAL",
                 }
             }
         ]
 
         sheets_api.spreadsheets().batchUpdate(
-            spreadsheetId=spreadsheet_id,
-            body={"requests": requests}
+            spreadsheetId=spreadsheet_id, body={"requests": requests}
         ).execute()
 
         clear_range = f"{backlog_month}!A{new_entry_row}:K{new_entry_row}"
         sheets_api.spreadsheets().values().clear(
-            spreadsheetId=spreadsheet_id,
-            range=clear_range
+            spreadsheetId=spreadsheet_id, range=clear_range
         ).execute()
 
     if day_first_entry_index is None:
@@ -227,18 +229,15 @@ def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
         data = [price] + remarks_list + [category, payment]
 
     body = {"values": [data]}
-    range_name = (
-        f"{backlog_month}!{sheet_column_start}{new_entry_row}:{sheet_column_end}{new_entry_row}"
-    )
+    range_name = f"{backlog_month}!{sheet_column_start}{new_entry_row}:{sheet_column_end}{new_entry_row}"
     sheets_api.spreadsheets().values().update(
         spreadsheetId=spreadsheet_id,
         range=range_name,
         valueInputOption="USER_ENTERED",
         body=body,
     ).execute()
-        
-    update_prev_day(spreadsheet_id, backlog_month, day_first_entry_index, new_entry_row)
 
+    update_prev_day(spreadsheet_id, backlog_month, day_first_entry_index, new_entry_row)
 
 
 def get_trackers(spreadsheet_id):
@@ -449,11 +448,11 @@ def get_first_row_to_move(spreadsheet_id, month, date):
     next_date = str(int(date) + 1)
     while next_date not in flat_list and int(next_date) < 32:
         next_date = str(int(next_date) + 1)
-    
+
     try:
         last_row = flat_list.index(next_date)
     except ValueError:
-        return None
+        return get_last_entered_row(spreadsheet_id, month) + 1
     return last_row + 1
 
 
@@ -470,8 +469,9 @@ def get_day_first_entry_index(spreadsheet_id, month, date):
         return None
     first_row = flat_list.index(date)
     first_row += 1
-    
+
     return first_row
+
 
 def get_work_place(spreadsheet_id):
     result = (
