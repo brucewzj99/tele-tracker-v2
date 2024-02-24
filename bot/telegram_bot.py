@@ -58,7 +58,7 @@ def start(update, context):
             return CS.SET_UP
     except Exception as e:
         print(e)
-        update.message.reply_text(ERROR_TEXT)
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -179,7 +179,7 @@ def config_handler(update, context) -> int:
             )
             return CS.CONFIG_SETUP
         except Exception as e:
-            update.callback_query.message.reply_text(ERROR_TEXT)
+            update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
             return ConversationHandler.END
 
 
@@ -199,7 +199,7 @@ def config_setup(update, context) -> int:
             return CS.CONFIG_CATEGORY
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
     update.callback_query.edit_message_text(END_TEXT, reply_markup=None)
     return ConversationHandler.END
@@ -234,7 +234,7 @@ def config_category(update, context) -> int:
                 return CS.CONFIG_SUBCATEGORY
     except Exception as e:
         print(e)
-        update.callback_query.reply_text(ERROR_TEXT)
+        update.callback_query.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -257,7 +257,7 @@ def config_subcategory(update, context) -> int:
         return CS.CONFIG_PAYMENT
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -277,7 +277,7 @@ def config_payment(update, context) -> int:
             return CS.CONFIG_SUBPAYMENT
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -303,7 +303,7 @@ def config_subpayment(update, context) -> int:
         return ConversationHandler.END
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -363,7 +363,7 @@ def remarks(update: Update, context) -> int:
         return CS.CATEGORY
     except Exception as e:
         print(e)
-        update.message.reply_text(ERROR_TEXT)
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -408,7 +408,7 @@ def category(update, context) -> int:
                 return CS.PAYMENT
     except Exception as e:
         print(e)
-        update.callback_query.reply_text(ERROR_TEXT)
+        update.callback_query.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -435,7 +435,7 @@ def subcategory(update, context) -> int:
         return CS.PAYMENT
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -467,7 +467,7 @@ def payment(update, context) -> int:
             return ConversationHandler.END
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -495,7 +495,7 @@ def subpayment(update, context) -> int:
 
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -608,7 +608,7 @@ def add_transport(update, context):
         )
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
     if not setting_list or not setting_list[0]:
         update.message.reply_text(QUICK_SETUP_TRANSPORT)
@@ -645,7 +645,7 @@ def add_others(update, context):
         )
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
     if not setting_list or not setting_list[0]:
         update.message.reply_text(QUICK_SETUP_OTHER)
@@ -693,7 +693,7 @@ def quick_add(update, context) -> int:
             update.message.reply_text("Transaction logged.")
             return ConversationHandler.END
         except Exception as e:
-            update.message.reply_text(ERROR_TEXT)
+            update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
             return ConversationHandler.END
     except Exception as e:
         print(e)
@@ -714,7 +714,7 @@ def get_day_transaction(update, context):
         return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
         print(e)
-        update.message.reply_text(ERROR_TEXT)
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -727,7 +727,7 @@ def get_overall(update, context):
         return CS.HANDLE_GET_OVERALL
     except Exception as e:
         print(e)
-        update.message.reply_text(ERROR_TEXT)
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -770,7 +770,7 @@ def handle_get_transaction(update, context):
             return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
         print(e)
-        update.message.reply_text(ERROR_TEXT)
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -807,7 +807,7 @@ def handle_get_overall(update, context):
             return CS.HANDLE_GET_OVERALL
     except Exception as e:
         print(e)
-        update.message.reply_text(ERROR_TEXT)
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -819,7 +819,7 @@ def add_income(update, context):
         update.message.reply_text(ADD_INCOME_TEXT)
     except Exception as e:
         print(e)
-        update.message.reply_text(ERROR_TEXT)
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
     return CS.INCOME
 
@@ -848,7 +848,7 @@ def income(update, context) -> int:
         return CS.WORK_PLACE
     except Exception as e:
         print(e)
-        update.message.reply_text(ERROR_TEXT)
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
@@ -882,7 +882,7 @@ def cpf(update, context) -> int:
         return ConversationHandler.END
     except Exception as e:
         print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT)
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
         return ConversationHandler.END
 
 
