@@ -1,3 +1,13 @@
+"""
+sheets_range.py
+
+This file contains the ranges for the Google Sheets Services for consistency.
+The ranges are used to access specific cells in the Google Sheets.
+
+"""
+
+from bot.google_sheet_service.utils import create_range, create_complex_range
+
 # Sheet names
 DD_SHEET = "Dropdown"  # DD for Dropdown
 TR_SHEET = "Tracker"  # TR for Tracker
@@ -40,28 +50,6 @@ END_COL_IDX = 11
 # Months
 OVERALL_RANGE = "!M13:O25"
 
-
-# Helper functions
-def create_range(sheet, start_col, start_row, end_col=None, end_row=None):
-    """
-    Create a standard range string.
-    Sample output: "Dropdown!A2:A9"
-    """
-    end_part = f":{end_col}{end_row}" if end_col and end_row else ""
-    return f"{sheet}!{start_col}{start_row}{end_part}"
-
-
-def create_complex_range(sheet, start_col_ord, end_col_ord, row_start, row_end):
-    """
-    Create a range string for complex cases.
-    Sample output: ["Dropdown!B2:B9", "Dropdown!C2:C9", ...]
-    """
-    return [
-        f"{sheet}!{chr(i)}{row_start}:{chr(i)}{row_end}"
-        for i in range(start_col_ord, end_col_ord)
-    ]
-
-
 # Transport ranges
 TRANSPORT_RANGE = create_range(
     DD_SHEET, DD_TRANSPORT_COL, DD_SUBCAT_START, DD_TRANSPORT_COL, DD_SUBCAT_END
@@ -71,6 +59,7 @@ TRANSPORT_RANGE = create_range(
 OTHERS_MAIN_RANGE = create_range(
     DD_SHEET, DD_OTHERS_COL_START, DD_MAIN_CAT_ROW, DD_OTHERS_COL_END, DD_MAIN_CAT_ROW
 )
+
 OTHERS_SUB_RANGE = create_complex_range(
     DD_SHEET,
     ord(DD_OTHERS_COL_START),
@@ -83,6 +72,7 @@ OTHERS_SUB_RANGE = create_complex_range(
 PAYMENT_MAIN_RANGE = create_range(
     DD_SHEET, DD_PAYMENT_COL_START, DD_MAIN_PAY_ROW, DD_PAYMENT_COL_END, DD_MAIN_PAY_ROW
 )
+
 PAYMENT_SUB_RANGE = create_complex_range(
     DD_SHEET,
     ord(DD_PAYMENT_COL_START),
@@ -107,6 +97,7 @@ QUICK_ADD_RANGE = create_range(
     TR_QUICKADD_OT_TYPE,
     TR_QUICKADD_ROW_START,
 )
+
 QUICK_OTHERS_RANGE = create_range(
     TR_SHEET,
     TR_QUICKADD_OT_PAY,
@@ -114,6 +105,7 @@ QUICK_OTHERS_RANGE = create_range(
     TR_QUICKADD_OT_TYPE,
     TR_QUICKADD_ROW_END,
 )
+
 QUICK_TRANSPORT_RANGE = create_range(
     TR_SHEET,
     TR_QUICKADD_TP_PAY,
