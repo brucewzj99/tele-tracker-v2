@@ -1,4 +1,8 @@
 # Release Notes
+## Version 2.2.1 - Date 24 Feb 2024
+### Changes 🛠️
+- Include error message when replying back to users
+
 ## Version 2.2.0 - Date 27 Jan 2024
 ### Bug Fix 🛠️
 - Fix backlog bug

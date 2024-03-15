@@ -14,7 +14,7 @@ SETUP_TEXT = (
     + "6. Copy your entire Google Sheet URL and send it over\n"
     + "Example: https://docs.google.com/spreadsheets/d/abcd1234/edit\n"
 )
-ERROR_TEXT = "There seems to be an error, please try again later. If the problem persists, please contact report it at github.com/brucewzj99/tele-tracker-v2/issues"
+ERROR_TEXT = "There seems to be an error, please try again later. If the problem persists, please report it at github.com/brucewzj99/tele-tracker-v2/issues"
 SUCCESS_LINK_TEXT = "Google sheet successfully linked! Please proceed to configure your Dropdown sheet.\nOnce completed, type /addentry to add your first entry!"
 GSHEET_ERROR_TEXT = f"There seems to be an error linking your google sheet, have you shared your Google Sheet with {GOOGLE_API_EMAIL} yet?"
 GSHEET_WRONG_TEXT = (
