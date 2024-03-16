@@ -1,4 +1,11 @@
 # Release Notes
+## Version 2.3.0 - Date 16 Mar 2024
+### For Developer 🧑‍💻
+- Create new database module which is currently in use for future maintenance and development purposes
+
+### Changes 🛠️
+- Censor URL for error message
+
 ## Version 2.2.1 - Date 24 Feb 2024
 ### Changes 🛠️
 - Include error message when replying back to users
