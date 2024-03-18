@@ -90,6 +90,8 @@ def get_sub_dropdown_value(spreadsheet_id, main_value, entry_type):
 
 
 def update_prev_day(spreadsheet_id, month, first_row, last_row=0):
+    month = month.title()
+
     if last_row == 0:
         last_row = get_last_entered_row(spreadsheet_id, month)
     body = {"values": [[f"=SUM(C{first_row}:H{last_row})"]]}
@@ -103,6 +105,8 @@ def update_prev_day(spreadsheet_id, month, first_row, last_row=0):
 
 
 def get_last_entered_row(spreadsheet_id, month):
+    month = month.title()
+
     result = (
         sheets_api.spreadsheets()
         .values()
@@ -114,6 +118,8 @@ def get_last_entered_row(spreadsheet_id, month):
 
 
 def create_date(spreadsheet_id, day, month, first_row):
+    month = month.title()
+
     body = {"values": [[day]]}
     range_name = f"{month}!A{first_row}"
     sheets_api.spreadsheets().values().update(
@@ -129,7 +135,9 @@ def create_entry(spreadsheet_id, month, row_tracker, row_data):
     price = row_data[1].strip()
     remarks = row_data[2].strip()
     category = row_data[3].strip()
-    payment = row_data[4].strip()
+    payment = row_data[4].strip()    
+    month = month.title()
+
 
     data = [price, remarks, category, payment]
     sheet_column_start = "H"
@@ -172,6 +180,7 @@ def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
     remarks = row_data[2].strip()
     category = row_data[3].strip()
     payment = row_data[4].strip()
+    backlog_month = backlog_month.title()
 
     day_first_entry_index = get_day_first_entry_index(
         spreadsheet_id, backlog_month, backlog_day
@@ -396,6 +405,7 @@ def get_quick_add_list(spreadsheet_id, entry_type):
 
 
 def get_day_transaction(spreadsheet_id, month, date):
+    month = month.title()
     result = (
         sheets_api.spreadsheets()
         .values()
@@ -437,6 +447,8 @@ def get_day_transaction(spreadsheet_id, month, date):
 
 
 def get_first_row_to_move(spreadsheet_id, month, date):
+    month = month.title()
+
     result = (
         sheets_api.spreadsheets()
         .values()
@@ -457,6 +469,8 @@ def get_first_row_to_move(spreadsheet_id, month, date):
 
 
 def get_day_first_entry_index(spreadsheet_id, month, date):
+    month = month.title()
+
     result = (
         sheets_api.spreadsheets()
         .values()
@@ -487,6 +501,8 @@ def get_work_place(spreadsheet_id):
 
 
 def update_income(spreadsheet_id, month, row_data):
+    month = month.title()
+
     data_mo = row_data[:3]
     data_r = [row_data[-1]]
     body_mo = {"values": [data_mo]}
@@ -523,6 +539,8 @@ def update_income(spreadsheet_id, month, row_data):
 
 
 def get_overall(spreadsheet_id, month):
+    month = month.title()
+
     result = (
         sheets_api.spreadsheets()
         .values()

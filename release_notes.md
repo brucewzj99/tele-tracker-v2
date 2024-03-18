@@ -1,4 +1,10 @@
 # Release Notes
+## Version 2.3.1 - Date 18 Mar 2024
+
+### Changes 🛠️
+- Censor URL for error message
+- Month capitalize bug fix
+
 ## Version 2.3.0 - Date 16 Mar 2024
 ### For Developer 🧑‍💻
 - Create new database module which is currently in use for future maintenance and development purposes

@@ -22,7 +22,6 @@ import bot.utils as utils
 timezone = pytz.timezone("Asia/Singapore")
 MASTER_TELE_ID = os.environ.get("MASTER_TELE_ID")
 
-
 def get_category_text(sheet_id, entry_type):
     msg = ""
     markup_list = []
@@ -57,8 +56,8 @@ def start(update, context):
             update.message.reply_text(SETUP_TEXT, parse_mode=ParseMode.HTML)
             return CS.SET_UP
     except Exception as e:
-        print(e)
-        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -179,7 +178,7 @@ def config_handler(update, context) -> int:
             )
             return CS.CONFIG_SETUP
         except Exception as e:
-            update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+            update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
             return ConversationHandler.END
 
 
@@ -198,8 +197,8 @@ def config_setup(update, context) -> int:
             )
             return CS.CONFIG_CATEGORY
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
     update.callback_query.edit_message_text(END_TEXT, reply_markup=None)
     return ConversationHandler.END
@@ -233,8 +232,8 @@ def config_category(update, context) -> int:
                 )
                 return CS.CONFIG_SUBCATEGORY
     except Exception as e:
-        print(e)
-        update.callback_query.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -256,8 +255,8 @@ def config_subcategory(update, context) -> int:
         )
         return CS.CONFIG_PAYMENT
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -276,8 +275,8 @@ def config_payment(update, context) -> int:
             )
             return CS.CONFIG_SUBPAYMENT
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -302,8 +301,8 @@ def config_subpayment(update, context) -> int:
         )
         return ConversationHandler.END
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -362,8 +361,8 @@ def remarks(update: Update, context) -> int:
         )
         return CS.CATEGORY
     except Exception as e:
-        print(e)
-        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -407,8 +406,8 @@ def category(update, context) -> int:
                 )
                 return CS.PAYMENT
     except Exception as e:
-        print(e)
-        update.callback_query.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -434,8 +433,8 @@ def subcategory(update, context) -> int:
         )
         return CS.PAYMENT
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -466,8 +465,8 @@ def payment(update, context) -> int:
             update.callback_query.message.reply_text("Transaction logged.")
             return ConversationHandler.END
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -494,8 +493,8 @@ def subpayment(update, context) -> int:
         return ConversationHandler.END
 
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -607,8 +606,8 @@ def add_transport(update, context):
             context.user_data["sheet_id"], EntryType.TRANSPORT
         )
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
     if not setting_list or not setting_list[0]:
         update.message.reply_text(QUICK_SETUP_TRANSPORT)
@@ -644,8 +643,8 @@ def add_others(update, context):
             context.user_data["sheet_id"], EntryType.OTHERS
         )
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
     if not setting_list or not setting_list[0]:
         update.message.reply_text(QUICK_SETUP_OTHER)
@@ -693,10 +692,10 @@ def quick_add(update, context) -> int:
             update.message.reply_text("Transaction logged.")
             return ConversationHandler.END
         except Exception as e:
-            update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+            update.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
             return ConversationHandler.END
     except Exception as e:
-        print(e)
+        
         update.message.reply_text("Please follow the format and try again.")
         return CS.QUICK_ADD
 
@@ -713,8 +712,8 @@ def get_day_transaction(update, context):
         update.message.reply_text(GET_TRANSACTION_TEXT)
         return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
-        print(e)
-        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -726,8 +725,8 @@ def get_overall(update, context):
         update.message.reply_text(GET_OVERALL_TEXT)
         return CS.HANDLE_GET_OVERALL
     except Exception as e:
-        print(e)
-        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -769,8 +768,8 @@ def handle_get_transaction(update, context):
             update.message.reply_text(GET_TRANSACTION_TEXT)
             return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
-        print(e)
-        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -806,8 +805,8 @@ def handle_get_overall(update, context):
             update.message.reply_text(GET_OVERALL_TEXT)
             return CS.HANDLE_GET_OVERALL
     except Exception as e:
-        print(e)
-        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -818,8 +817,8 @@ def add_income(update, context):
         context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id)
         update.message.reply_text(ADD_INCOME_TEXT)
     except Exception as e:
-        print(e)
-        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
     return CS.INCOME
 
@@ -847,8 +846,8 @@ def income(update, context) -> int:
         )
         return CS.WORK_PLACE
     except Exception as e:
-        print(e)
-        update.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -881,8 +880,8 @@ def cpf(update, context) -> int:
             update.callback_query.message.reply_text(INCOME_LIMIT_TEXT)
         return ConversationHandler.END
     except Exception as e:
-        print(e)
-        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" + str(e))
+        
+        update.callback_query.message.reply_text(ERROR_TEXT + "\nError:\n" +utils.sanitize_error_message(str(e)))
         return ConversationHandler.END
 
 
@@ -896,7 +895,7 @@ def backlog(update, context) -> int:
 def add_backlog_entry(update, context) -> int:
     reply = update.message.text
     if utils.check_date_format(reply):
-        if reply == dt.datetime.now(timezone).strftime("%d %b").lstrip("0"):
+        if reply == dt.datetime.now(timezone).strftime("%d %b").lstrip("0").lower():
             context.user_data["backlog"] = False
         else:
             day, month = reply.split(" ")
