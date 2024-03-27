@@ -227,6 +227,7 @@ def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
 
     if day_first_entry_index is None:
         create_date(spreadsheet_id, backlog_day, backlog_month, new_entry_row)
+        day_first_entry_index = new_entry_row
 
     data = [price, remarks, category, payment]
     sheet_column_start = "H"
