@@ -1,7 +1,10 @@
 # Release Notes
-## Version 2.3.1 - Date 18 Mar 2024
+## Version 2.3.2 - Date 27 Mar 2024
+### Bug Fix 🛠️
+- Fix backlog new date entry bug
 
-### Changes 🛠️
+## Version 2.3.1 - Date 18 Mar 2024
+### Bug Fix 🛠️
 - Censor URL for error message
 - Month capitalize bug fix
 
@@ -9,11 +12,11 @@
 ### For Developer 🧑‍💻
 - Create new database module which is currently in use for future maintenance and development purposes
 
-### Changes 🛠️
+### Bug Fix 🛠️
 - Censor URL for error message
 
 ## Version 2.2.1 - Date 24 Feb 2024
-### Changes 🛠️
+### Bug Fix 🛠️
 - Include error message when replying back to users
 
 ## Version 2.2.0 - Date 27 Jan 2024
