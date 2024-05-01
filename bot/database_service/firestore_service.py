@@ -1,5 +1,5 @@
 from bot.database_service.auth import get_db_client
-
+from datetime import datetime
 
 class FirestoreService:
     """
@@ -10,9 +10,13 @@ class FirestoreService:
         self.db = get_db_client()
 
     # New user setup
-    def new_user_setup(self, telegram_id, sheet_id):
+    def new_user_setup(self, telegram_id, sheet_id, telegram_username):
         user_ref = self.db.collection("users").document(str(telegram_id))
-        user_ref.set({"sheet_id": sheet_id})
+        user_ref.set({
+            "sheet_id": sheet_id,
+            "datetime_created": datetime.now(),
+            "username": telegram_username
+        })
 
     # Check if user exists
     def check_if_user_exists(self, telegram_id):
