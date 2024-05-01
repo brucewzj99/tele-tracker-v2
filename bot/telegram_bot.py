@@ -63,6 +63,7 @@ def start(update, context):
 
 def set_up(update, context) -> int:
     telegram_id = update.effective_user.id
+    telegram_username = update.effective_user.username
     url = update.message.text
 
     pattern = r"/d/([a-zA-Z0-9-_]+)"
@@ -70,7 +71,7 @@ def set_up(update, context) -> int:
     if match:
         sheet_id = match.group(1)
         try:
-            db.new_user_setup(telegram_id, sheet_id)
+            db.new_user_setup(telegram_id, sheet_id, telegram_username)
             current_datetime = dt.datetime.now(timezone)
             day = current_datetime.day
             month = current_datetime.strftime("%b")

@@ -1,4 +1,9 @@
 # Release Notes
+## Version 2.3.3 - Date 1 May 2024
+### Minor Fix 🛠️
+- Add datetime and username for logging purposes
+- Add more message to help command
+
 ## Version 2.3.2 - Date 27 Mar 2024
 ### Bug Fix 🛠️
 - Fix backlog new date entry bug

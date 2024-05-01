@@ -55,7 +55,8 @@ HELP_TEXT = (
     + "/getdaytransaction - Retrieve transaction from dates\n"
     + "/getoverall - Retrieve overall transaction for a month\n"
     + "/cancel - Cancel Conversation\n"
-    + "\nTo report bugs, please create a issue at https://github.com/brucewzj99/tele-tracker-v2/issues or contact me @bruceeew on Telegram"
+    + "\nTo report bugs or request any features, please create a issue at https://github.com/brucewzj99/tele-tracker-v2/issues\n"
+    + "\nYou can support me by buying me a coffee at https://ko-fi.com/brucewzj"
 )
 
 GET_TRANSACTION_TEXT = "Please specify the date and month you wish to retrieve from in this format: DD MMM\ne.g 16 Mar\n\nUse 'tdy' to retrieve the transacation for today \nor use /cancel to exit"
