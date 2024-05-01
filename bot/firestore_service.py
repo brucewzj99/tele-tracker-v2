@@ -1,10 +1,15 @@
+from datetime import datetime
 from bot.firestore_config import db
 
 
 # New user setup
-def new_user_setup(telegram_id, sheet_id):
+def new_user_setup(telegram_id, sheet_id, telegram_username):
     user_ref = db.collection("users").document(str(telegram_id))
-    user_ref.set({"sheet_id": sheet_id})
+    user_ref.set({
+        "sheet_id": sheet_id,
+        "datetime_created": datetime.now(),
+        "username": telegram_username
+    })
 
 
 # Check if user exists
