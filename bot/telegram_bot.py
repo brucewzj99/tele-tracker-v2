@@ -990,7 +990,11 @@ def send_new_feature_message(context, new_feature_message):
 
     for user_id in users:
         try:
-            context.bot.send_message(chat_id=user_id, text=new_feature_message)
+            context.bot.send_message(
+                chat_id=user_id,
+                text=new_feature_message,
+                parse_mode=ParseMode.HTML,
+            )
             no_of_users += 1
         except Exception as e:
             try:
@@ -1022,7 +1026,6 @@ def notify_all(update, context):
         update.message.reply_text(
             f"Preview:\n{new_feature_message}",
             reply_markup=reply_markup,
-            parse_mode=ParseMode.HTML,
         )
     else:
         update.message.reply_text("You are not authorized to use this command.")
