@@ -1,4 +1,14 @@
 # Release Notes
+## Version 2.3.4 - Date 3 May 2024
+### Enhancement 🔥
+- Added FAQ section
+
+### For Developer 🧑‍💻
+- Add accessed time and usage count to database for tracking purposes
+- Rename `test_` prefix to `dev_` for developer testing
+- Remove old firestore codes, use new database module
+- Added test for database module
+
 ## Version 2.3.3 - Date 1 May 2024
 ### Minor Fix 🛠️
 - Add datetime and username for logging purposes
@@ -45,7 +55,7 @@
 - Fix empty subcategory and subpayment bug
 
 ### New Features 🆕
-- Added a new shortcode to retrieve transaction for today `/today`
+- Added a new shortcode to retrieve transaction for today
 
 ### For Developer 🧑‍💻
 - Mini refactor of code, added utils folder to store helper functions
