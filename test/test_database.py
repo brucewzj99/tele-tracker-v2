@@ -7,7 +7,7 @@ class TestFirestoreService(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.db = firestore_service.FirestoreService(collection_name="test_users")
+        cls.db = firestore_service.FirestoreService()
         cls.telegram_id = "123456"
         cls.sheet_id = "sheet123"
         cls.telegram_username = "test_user"
