@@ -1,4 +1,12 @@
 # Release Notes
+## Version 2.3.6 - Date 3 May 2024
+### Quick Fix 🛠️
+- Fix parse mode for /notifyall command
+
+## Version 2.3.5 - Date 3 May 2024
+### For Developer 🧑‍💻
+- Add parse html for /notifyall command to send message with html tags
+
 ## Version 2.3.4 - Date 3 May 2024
 ### Enhancement 🔥
 - Added FAQ section
