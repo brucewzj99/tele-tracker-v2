@@ -6,6 +6,9 @@ A python telegram bot to help track daily expenses onto google sheet, hosted on 
 ## Release Notes
 You can find the release notes over [here](https://github.com/brucewzj99/tele-tracker-v2/blob/master/release_notes.md).
 
+## FAQ
+You can find the FAQ over [here](https://github.com/brucewzj99/tele-tracker-v2/blob/main/FAQ.md).
+
 ## Table of Contents
 - [Getting Started (Users)](#getting-started-users)
 - [Getting Started (Developers)](#getting-started-developers)
@@ -35,15 +38,14 @@ pip install -r requirements.txt
 * Set up Google Sheet API, download service account key
 * Retrieve Google Sheet API email
 * Set up Firebase Firestore Database, download service account key
-* Retrieve your firebase database url
 * Set up telegram bot via [BotFather](https://t.me/BotFather)
 * Insert all of them into .env as follows, you can use py dotenv or set it as env variable in your venv
 * You can use the same TOKEN for BOT_TOKEN & TEST_TOKEN but I recommend using two different bots for testing and production
+* I recommend having two different firebase databases for testing and production
 
 ``` .env
 BOT_TOKEN=your_bot_token
 TEST_TOKEN=your_test_token
-DATABASE_URL=firebase_url
 GOOGLE_API_EMAIL=google_api_email
 FIREBASE_JSON=service_account_key
 GOOGLE_JSON=service_account_key
@@ -53,9 +55,9 @@ MASTER_TELE_ID=your_telegram_id
 ### Step 3
 * Proceed to project directory and run:
 ``` python
-python3.9 test_polling.py
+python3.9 dev_polling.py
 OR
-python3.9 test_webhook.py
+python3.9 dev_webhook.py
 ```
 
 ## Usage
