@@ -986,6 +986,7 @@ def add_backlog_entry(update, context) -> int:
 def send_new_feature_message(context, new_feature_message):
     users = db.get_all_user_id()
     no_of_users = 0
+    no_of_error_users = 0
     errors = []
 
     for user_id in users:
@@ -1002,11 +1003,11 @@ def send_new_feature_message(context, new_feature_message):
                 username = chat.username if chat.username else "?"
             except Exception:
                 username = "?"
-
+            no_of_error_users += 1
             errors.append(f"Username @{username} (ID: {user_id}): {e}")
 
     error_message = "\n".join(errors)
-    return no_of_users, error_message
+    return no_of_users, no_of_error_users, error_message
 
 
 def notify_all(update, context):
@@ -1027,19 +1028,21 @@ def notify_all(update, context):
             f"Preview:\n{new_feature_message}",
             reply_markup=reply_markup,
         )
-    else:
-        update.message.reply_text("You are not authorized to use this command.")
 
 
 def notify_preview(update, context):
     query = update.callback_query
     query.answer()
+    query.edit_message_text(
+        text=f"Sending message to all in progress...",
+        reply_markup=InlineKeyboardMarkup([]),
+    )
     if query.data == "confirm_send":
         new_feature_message = query.message.text.partition("\n")[2]
-        no_of_users, error_message = send_new_feature_message(
+        no_of_users, no_of_error_users, error_message = send_new_feature_message(
             context, new_feature_message
         )
-        response = f"Message sent to {no_of_users} users."
+        response = f"Message sent to {no_of_users} users.\n{no_of_error_users} users failed to receive the message."
         if error_message:
             response += f"\nErrors:\n{error_message}"
         query.edit_message_text(text=response)

@@ -1,4 +1,8 @@
 # Release Notes
+## Version 2.3.7 - Date 3 May 2024
+### Quick Fix 🛠️
+- Add number of error users for /notifyall command
+
 ## Version 2.3.6 - Date 3 May 2024
 ### Quick Fix 🛠️
 - Fix parse mode for /notifyall command
