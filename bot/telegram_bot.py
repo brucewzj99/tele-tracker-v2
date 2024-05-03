@@ -1020,7 +1020,9 @@ def notify_all(update, context):
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
-            f"Preview:\n{new_feature_message}", reply_markup=reply_markup
+            f"Preview:\n{new_feature_message}",
+            reply_markup=reply_markup,
+            parse_mode=ParseMode.HTML,
         )
     else:
         update.message.reply_text("You are not authorized to use this command.")
