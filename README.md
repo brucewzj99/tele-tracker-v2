@@ -38,10 +38,10 @@ pip install -r requirements.txt
 * Set up Google Sheet API, download service account key
 * Retrieve Google Sheet API email
 * Set up Firebase Firestore Database, download service account key
-* Retrieve your firebase database url
 * Set up telegram bot via [BotFather](https://t.me/BotFather)
 * Insert all of them into .env as follows, you can use py dotenv or set it as env variable in your venv
 * You can use the same TOKEN for BOT_TOKEN & TEST_TOKEN but I recommend using two different bots for testing and production
+* I recommend having two different firebase databases for testing and production
 
 ``` .env
 BOT_TOKEN=your_bot_token
@@ -55,9 +55,9 @@ MASTER_TELE_ID=your_telegram_id
 ### Step 3
 * Proceed to project directory and run:
 ``` python
-python3.9 test_polling.py
+python3.9 dev_polling.py
 OR
-python3.9 test_webhook.py
+python3.9 dev_webhook.py
 ```
 
 ## Usage
