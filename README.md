@@ -6,6 +6,9 @@ A python telegram bot to help track daily expenses onto google sheet, hosted on 
 ## Release Notes
 You can find the release notes over [here](https://github.com/brucewzj99/tele-tracker-v2/blob/master/release_notes.md).
 
+## FAQ
+You can find the FAQ over [here](https://github.com/brucewzj99/tele-tracker-v2/blob/main/FAQ.md).
+
 ## Table of Contents
 - [Getting Started (Users)](#getting-started-users)
 - [Getting Started (Developers)](#getting-started-developers)
@@ -43,7 +46,6 @@ pip install -r requirements.txt
 ``` .env
 BOT_TOKEN=your_bot_token
 TEST_TOKEN=your_test_token
-DATABASE_URL=firebase_url
 GOOGLE_API_EMAIL=google_api_email
 FIREBASE_JSON=service_account_key
 GOOGLE_JSON=service_account_key
