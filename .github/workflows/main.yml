@@ -8,7 +8,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    env:
+      FIREBASE_JSON: ${{ secrets.FIREBASE_JSON }}
+      
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9.13

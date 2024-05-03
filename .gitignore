@@ -164,3 +164,4 @@ cython_debug/
 test_func.py
 users_backup.json
 one_off_func.py
+*.json
