@@ -1,6 +1,7 @@
 from bot.database_service.auth import get_db_client
 from datetime import datetime, timedelta
 import pytz
+from bot.error_handler import DatabaseError
 
 
 class FirestoreService:
@@ -14,25 +15,37 @@ class FirestoreService:
 
     # New user setup
     def new_user_setup(self, telegram_id, sheet_id, telegram_username):
-        user_ref = self.db.collection(self.collection_name).document(str(telegram_id))
-        timestamp = datetime.now(pytz.timezone("Asia/Singapore"))
-        user_ref.set(
-            {
-                "sheet_id": sheet_id,
-                "datetime_created": timestamp,
-                "username": telegram_username,
-                "usage_count": 0,
-                "last_accessed": timestamp,
-                "hourly_accessed": timestamp,
-                "overusage_count": 0,
-            }
-        )
+        try:
+            user_ref = self.db.collection(self.collection_name).document(
+                str(telegram_id)
+            )
+            timestamp = datetime.now(pytz.timezone("Asia/Singapore"))
+            user_ref.set(
+                {
+                    "sheet_id": sheet_id,
+                    "datetime_created": timestamp,
+                    "username": telegram_username,
+                    "usage_count": 0,
+                    "last_accessed": timestamp,
+                    "hourly_accessed": timestamp,
+                    "overusage_count": 0,
+                }
+            )
+        except Exception as e:
+            raise DatabaseError(message="Error setting up new user", extra_info=str(e))
 
     # Check if user exists
     def check_if_user_exists(self, telegram_id):
-        user_ref = self.db.collection(self.collection_name).document(str(telegram_id))
-        user_doc = user_ref.get()
-        return user_doc.exists
+        try:
+            user_ref = self.db.collection(self.collection_name).document(
+                str(telegram_id)
+            )
+            user_doc = user_ref.get()
+            return user_doc.exists
+        except Exception as e:
+            raise DatabaseError(
+                message="Error checking if user exists", extra_info=str(e)
+            )
 
     # Get user sheet id
     def get_user_sheet_id(self, telegram_id, telegram_username):
@@ -76,19 +89,18 @@ class FirestoreService:
                 )
                 return user_doc.get("sheet_id")
             except Exception as e:
-                raise e
-        return None
+                raise DatabaseError(
+                    message="Error getting user sheet id", extra_info=str(e)
+                )
+        raise DatabaseError(
+                    message="Error getting user sheet id", extra_info="User does not exist"
+                )
 
     # Get all user IDs
     def get_all_user_id(self):
-        users_ref = self.db.collection(self.collection_name)
-        user_ids = [int(user.id) for user in users_ref.stream()]
-        return user_ids
-
-    # Get all sheet IDs
-    def get_all_sheet_id(self):
-        users_ref = self.db.collection(self.collection_name)
-        sheet_ids = []
-        for user in users_ref.stream():
-            sheet_ids.append(user.get("sheet_id"))
-        return sheet_ids
+        try:
+            users_ref = self.db.collection(self.collection_name)
+            user_ids = [int(user.id) for user in users_ref.stream()]
+            return user_ids
+        except Exception as e:
+            raise DatabaseError(message="Error getting all user ids", extra_info=str(e))

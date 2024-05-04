@@ -7,8 +7,8 @@ sheet_api.py
 # sheets_api.py
 from googleapiclient.discovery import build
 from bot.common import EntryType
-from bot.google_sheet_service.auth import get_credentials
-from bot.google_sheet_service.sheets_range import *
+from bot.sheet_service.auth import get_credentials
+from bot.sheet_service.sheets_range import *
 
 
 class GoogleSheetsClient:
