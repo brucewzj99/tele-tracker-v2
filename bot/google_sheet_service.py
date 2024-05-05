@@ -248,6 +248,8 @@ def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
                 sheets_api.spreadsheets().values().clear(
                     spreadsheetId=spreadsheet_id, range=clear_range
                 ).execute()
+                
+                update_prev_day(spreadsheet_id, backlog_month, day_first_entry_index, new_entry_row)
             except GoogleSheetError as e:
                 raise e
             except Exception as e:
@@ -275,12 +277,8 @@ def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
                 valueInputOption="USER_ENTERED",
                 body=body,
             ).execute()
-
-        except GoogleSheetError as e:
-            raise e
         except Exception as e:
             raise GoogleSheetError(message=f"Fail to create backlog entry", extra_info=str(e))
-        update_prev_day(spreadsheet_id, backlog_month, day_first_entry_index, new_entry_row)
     except GoogleSheetError as e:
         raise e
     except Exception as e:

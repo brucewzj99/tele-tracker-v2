@@ -93,7 +93,7 @@ class FirestoreService:
                     message="Error getting user sheet id", extra_info=str(e)
                 )
         raise DatabaseError(
-                    message="Error getting user sheet id", extra_info="User does not exist"
+                    message="User does not exist", extra_info="User does not exist"
                 )
 
     # Get all user IDs

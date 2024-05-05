@@ -72,10 +72,6 @@ def start(update, context):
         else:
             update.message.reply_text(SETUP_TEXT, parse_mode=ParseMode.HTML)
             return CS.SET_UP
-    except DatabaseError as e:
-        update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -209,10 +205,6 @@ def config_handler(update, context) -> int:
                 msg, reply_markup=utils.create_inline_markup(keyboard_list)
             )
             return CS.CONFIG_SETUP
-        except GoogleSheetError as e:
-            update.callback_query.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-            )
         except Exception as e:
             update.callback_query.message.reply_text(
                 ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -234,11 +226,6 @@ def config_setup(update, context) -> int:
                 reply_markup=utils.create_inline_markup(markup_list),
             )
             return CS.CONFIG_CATEGORY
-        
-    except GoogleSheetError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -275,11 +262,6 @@ def config_category(update, context) -> int:
                     reply_markup=utils.create_inline_markup(sub_markup_list),
                 )
                 return CS.CONFIG_SUBCATEGORY
-            
-    except GoogleSheetError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
         update.callback_query.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -304,10 +286,6 @@ def config_subcategory(update, context) -> int:
             DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
         )
         return CS.CONFIG_PAYMENT    
-    except GoogleSheetError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -329,10 +307,6 @@ def config_payment(update, context) -> int:
                 reply_markup=utils.create_inline_markup(sub_markup_list),
             )
             return CS.CONFIG_SUBPAYMENT
-    except GoogleSheetError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -360,10 +334,6 @@ def config_subpayment(update, context) -> int:
             f'Default {context.user_data["config"].value} settings updated.'
         )
         return ConversationHandler.END
-    except GoogleSheetError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -384,7 +354,7 @@ def add_entry(update, context):
             ),
         )
         return CS.ENTRY
-    except DatabaseError as e:
+    except Exception as e:
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -434,12 +404,7 @@ def remarks(update: Update, context) -> int:
             msg, reply_markup=utils.create_inline_markup(markup_list)
         )
         return CS.CATEGORY
-    except TelegramBotError as e:
-        update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -485,16 +450,7 @@ def category(update, context) -> int:
                     reply_markup=utils.create_inline_markup(payment_list),
                 )
                 return CS.PAYMENT
-    except TelegramBotError as e:
-        update.callback_query.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
-    except GoogleSheetError as e:
-        update.callback_query.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
-
         update.callback_query.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -522,12 +478,7 @@ def subcategory(update, context) -> int:
             DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
         )
         return CS.PAYMENT
-    except TelegramBotError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -559,15 +510,6 @@ def payment(update, context) -> int:
             else:
                 log_transaction(context.user_data, update)
             update.callback_query.message.reply_text("Transaction logged.")
-
-    except TelegramBotError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
-    except GoogleSheetError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -596,12 +538,7 @@ def subpayment(update, context) -> int:
         else:
             log_transaction(context.user_data, update)
         update.callback_query.message.reply_text("Transaction logged.")
-    except TelegramBotError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -728,11 +665,6 @@ def add_transport(update, context):
         setting_list = gs.get_quick_add_settings(
             context.user_data["sheet_id"], EntryType.TRANSPORT
         )
-    except GoogleSheetError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
-        return ConversationHandler.END
     except Exception as e:
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -762,10 +694,6 @@ def add_transport(update, context):
                     reply_markup=utils.create_inline_markup(setting_list),
                 )
                 return CS.QUICK_ADD_TRANSPORT
-        except GoogleSheetError as e:
-            update.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-            )
         except Exception as e:
             update.message.reply_text(
                 ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -785,16 +713,6 @@ def add_others(update, context):
         setting_list = gs.get_quick_add_settings(
             context.user_data["sheet_id"], EntryType.OTHERS
         )
-    except GoogleSheetError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
-        return ConversationHandler.END
-    except DatabaseError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
-        return ConversationHandler.END
     except Exception as e:
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -812,10 +730,6 @@ def add_others(update, context):
             update.message.reply_text(
                 "Quick Add Others, please choose your category.",
                 reply_markup=utils.create_inline_markup(setting_list),
-            )
-        except GoogleSheetError as e:
-            update.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
             )
         except Exception as e:
             update.message.reply_text(
@@ -855,11 +769,6 @@ def quick_add(update, context) -> int:
             log_transaction(context.user_data, update)
             update.message.reply_text("Transaction logged.")
             return ConversationHandler.END
-        except TelegramBotError as e:
-            update.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-            )
-            return ConversationHandler.END
         except Exception as e:
             update.message.reply_text(
                 ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -884,16 +793,11 @@ def get_day_transaction(update, context):
         )
         update.message.reply_text(GET_TRANSACTION_TEXT)
         return CS.HANDLE_GET_TRANSACTION
-    except DatabaseError as e:
-        update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-    return ConversationHandler.END
+        return ConversationHandler.END
 
 
 def get_overall(update, context):
@@ -906,12 +810,7 @@ def get_overall(update, context):
         )
         update.message.reply_text(GET_OVERALL_TEXT)
         return CS.HANDLE_GET_OVERALL
-    except DatabaseError as e:
-        update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -1018,10 +917,6 @@ def add_income(update, context):
         )
         update.message.reply_text(ADD_INCOME_TEXT)
         return CS.INCOME
-    except DatabaseError as e:
-        update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -1051,12 +946,7 @@ def income(update, context) -> int:
             reply_markup=utils.create_inline_markup(work_list),
         )
         return CS.WORK_PLACE
-    except GoogleSheetError as e:
-        update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -1090,11 +980,6 @@ def cpf(update, context) -> int:
             update.callback_query.message.reply_text("Income has been added!")
         else:
             update.callback_query.message.reply_text(INCOME_LIMIT_TEXT)
-
-    except GoogleSheetError as e:
-        update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
-        )
     except Exception as e:
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
@@ -1140,30 +1025,35 @@ def add_backlog_entry(update, context) -> int:
 
 
 def send_new_feature_message(context, new_feature_message):
-    users = db.get_all_user_id()
-    no_of_users = 0
-    no_of_error_users = 0
-    errors = []
-
-    for user_id in users:
-        try:
-            context.bot.send_message(
-                chat_id=user_id,
-                text=new_feature_message,
-                parse_mode=ParseMode.HTML,
-            )
-            no_of_users += 1
-        except Exception as e:
+    try:
+        users = db.get_all_user_id()
+        no_of_users = 0
+        no_of_error_users = 0
+        errors = []
+        
+        for user_id in users:
             try:
-                chat = context.bot.get_chat(chat_id=user_id)
-                username = chat.username if chat.username else "?"
-            except Exception:
-                username = "?"
-            no_of_error_users += 1
-            errors.append(f"Username @{username} (ID: {user_id}): {e}")
+                context.bot.send_message(
+                    chat_id=user_id,
+                    text=new_feature_message,
+                    parse_mode=ParseMode.HTML,
+                )
+                no_of_users += 1
+            except Exception as e:
+                try:
+                    chat = context.bot.get_chat(chat_id=user_id)
+                    username = chat.username if chat.username else "?"
+                except Exception:
+                    username = "?"
+                no_of_error_users += 1
+                errors.append(f"Username @{username} (ID: {user_id}): {e}")
 
-    error_message = "\n".join(errors)
-    return no_of_users, no_of_error_users, error_message
+        error_message = "\n".join(errors)
+        return no_of_users, no_of_error_users, error_message
+    except DatabaseError as e:
+        raise e
+    except Exception as e:
+        raise TelegramBotError(message="Fail to send new feature message", extra_info=str(e))    
 
 
 def notify_all(update, context):
@@ -1187,26 +1077,30 @@ def notify_all(update, context):
     return CS.NOTIFICATION
 
 def notify_preview(update, context):
-    print("calling notify preview")
-    print(update)
-    print(context)
     query = update.callback_query
     query.answer()
     query.edit_message_text(
         text=f"Sending message to all in progress...",
         reply_markup=InlineKeyboardMarkup([]),
     )
-    if query.data == "confirm_send" and str(update.effective_user.id) == MASTER_TELE_ID:
-        new_feature_message = query.message.text.partition("\n")[2]
-        no_of_users, no_of_error_users, error_message = send_new_feature_message(
-            context, new_feature_message
+    try:
+        if query.data == "confirm_send" and str(update.effective_user.id) == MASTER_TELE_ID:
+            new_feature_message = query.message.text.partition("\n")[2]
+            no_of_users, no_of_error_users, error_message = send_new_feature_message(
+                context, new_feature_message
+            )
+
+            response = f"Message sent to {no_of_users} users.\n{no_of_error_users} users failed to receive the message."
+            if error_message:
+                response += f"\nErrors:\n{error_message}"
+            query.edit_message_text(text=response)
+        elif query.data == "cancel_send":
+            query.edit_message_text(text="Message sending cancelled.")
+    except Exception as e:
+        query.edit_message_text(
+            text=ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        response = f"Message sent to {no_of_users} users.\n{no_of_error_users} users failed to receive the message."
-        if error_message:
-            response += f"\nErrors:\n{error_message}"
-        query.edit_message_text(text=response)
-    elif query.data == "cancel_send":
-        query.edit_message_text(text="Message sending cancelled.")
+    return ConversationHandler.END
 
 
 def setup_handlers(dispatcher):
