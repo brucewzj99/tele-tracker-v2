@@ -1,7 +1,10 @@
 # Release Notes
-## Version 2.4 - Date 5 May 2024
+## Version 2.4 - Date 6 May 2024
 ### Enhancement 🔥
 - Clearer error messages for users
+
+### For Developer 🧑‍💻
+- Added more test case
 
 ## Version 2.3.7 - Date 3 May 2024
 ### For Developer 🧑‍💻
