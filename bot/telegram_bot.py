@@ -19,6 +19,8 @@ import bot.google_sheet_service as gs
 from bot.database_service import firestore_service
 import bot.utils as utils
 
+from bot.error_handler import TelegramBotError, GoogleSheetError, DatabaseError
+
 db = firestore_service.FirestoreService()
 timezone = pytz.timezone("Asia/Singapore")
 MASTER_TELE_ID = os.environ.get("MASTER_TELE_ID")
@@ -27,18 +29,28 @@ MASTER_TELE_ID = os.environ.get("MASTER_TELE_ID")
 def get_category_text(sheet_id, entry_type):
     msg = ""
     markup_list = []
-    if entry_type == EntryType.TRANSPORT:
-        msg = DEFAULT_TRANSPORT_TEXT
-        markup_list = gs.get_main_dropdown_value(sheet_id, EntryType.TRANSPORT)
-    elif entry_type == EntryType.OTHERS:
-        msg = DEFAULT_CATEGORY_TEXT
-        markup_list = gs.get_main_dropdown_value(sheet_id, EntryType.OTHERS)
-    return msg, markup_list
+    try:
+        if entry_type == EntryType.TRANSPORT:
+            msg = DEFAULT_TRANSPORT_TEXT
+            markup_list = gs.get_main_dropdown_value(sheet_id, EntryType.TRANSPORT)
+        elif entry_type == EntryType.OTHERS:
+            msg = DEFAULT_CATEGORY_TEXT
+            markup_list = gs.get_main_dropdown_value(sheet_id, EntryType.OTHERS)
+        return msg, markup_list
+    except GoogleSheetError as e:
+        raise e
+    except Exception as e:
+        raise TelegramBotError(message="Error getting category text", extra_info=str(e))
 
 
 def get_payment_text(sheet_id):
-    payment_list = gs.get_main_dropdown_value(sheet_id, "Payment")
-    return payment_list
+    try:
+        payment_list = gs.get_main_dropdown_value(sheet_id, "Payment")
+        return payment_list
+    except GoogleSheetError as e:
+        raise e
+    except Exception as e:
+        raise TelegramBotError(message="Error getting payment text", extra_info=str(e))
 
 
 def start(update, context):
@@ -64,7 +76,7 @@ def start(update, context):
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def set_up(update, context) -> int:
@@ -96,25 +108,33 @@ def set_up(update, context) -> int:
                     gs.update_prev_day(sheet_id, prev_month, first_row)
                     new_row = gs.get_last_entered_row(sheet_id, month)
                     first_row = new_row + 1
-                    gs.update_rows(sheet_id, day, new_row, first_row)
+                    gs.update_tracker_values(sheet_id, day, new_row, first_row)
                     gs.create_date(sheet_id, day, month, first_row)
                 elif day == 1:
                     new_row = 4
                     first_row = 5
-                    gs.update_rows(sheet_id, day, new_row, first_row)
+                    gs.update_tracker_values(sheet_id, day, new_row, first_row)
                     gs.create_date(sheet_id, day, month, first_row)
             else:  # New sheet
                 new_row = 4
                 first_row = 5
-                gs.update_rows(
+                gs.update_tracker_values(
                     sheet_id, day, new_row, first_row
                 )  # New users start from row 5
             gs.create_date(sheet_id, day, month, first_row)
             update.message.reply_text(SUCCESS_LINK_TEXT)
-            return ConversationHandler.END
+
+        except GoogleSheetError as e:
+            update.message.reply_text(
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
+            )
+        except DatabaseError as e:
+            update.message.reply_text(
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
+            )
         except Exception as e:
             update.message.reply_text(GSHEET_ERROR_TEXT)
-            return ConversationHandler.END
+        return ConversationHandler.END
     else:
         update.message.reply_text(GSHEET_WRONG_TEXT)
         return CS.SET_UP
@@ -189,7 +209,7 @@ def config_handler(update, context) -> int:
             update.callback_query.message.reply_text(
                 ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
             )
-            return ConversationHandler.END
+        return ConversationHandler.END
 
 
 def config_setup(update, context) -> int:
@@ -207,7 +227,6 @@ def config_setup(update, context) -> int:
             )
             return CS.CONFIG_CATEGORY
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -244,7 +263,6 @@ def config_category(update, context) -> int:
                 )
                 return CS.CONFIG_SUBCATEGORY
     except Exception as e:
-
         update.callback_query.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -269,7 +287,6 @@ def config_subcategory(update, context) -> int:
         )
         return CS.CONFIG_PAYMENT
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -291,7 +308,6 @@ def config_payment(update, context) -> int:
             )
             return CS.CONFIG_SUBPAYMENT
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -319,7 +335,6 @@ def config_subpayment(update, context) -> int:
         )
         return ConversationHandler.END
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -330,14 +345,22 @@ def add_entry(update, context):
     context.user_data.clear()
     telegram_id = update.effective_user.id
     telegram_username = update.effective_user.username
-    context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id, telegram_username)
-    update.message.reply_text(
-        ENTRY_TYPE_TEXT,
-        reply_markup=utils.create_inline_markup(
-            [entry_type.value for entry_type in EntryType]
-        ),
-    )
-    return CS.ENTRY
+    try:
+        context.user_data["sheet_id"] = db.get_user_sheet_id(
+            telegram_id, telegram_username
+        )
+        update.message.reply_text(
+            ENTRY_TYPE_TEXT,
+            reply_markup=utils.create_inline_markup(
+                [entry_type.value for entry_type in EntryType]
+            ),
+        )
+        return CS.ENTRY
+    except Exception as e:
+        update.message.reply_text(
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
+        )
+        return ConversationHandler.END
 
 
 def entry(update, context) -> int:
@@ -375,18 +398,18 @@ def remarks(update: Update, context) -> int:
         if reply.count(",") != 1:
             update.message.reply_text(TRANSPORT_DEFAULT_TEXT)
             return CS.REMARKS
-    msg, markup_list = get_category_text(sheet_id, entry_type)
+
     try:
+        msg, markup_list = get_category_text(sheet_id, entry_type)
         update.message.reply_text(
             msg, reply_markup=utils.create_inline_markup(markup_list)
         )
         return CS.CATEGORY
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def category(update, context) -> int:
@@ -429,11 +452,10 @@ def category(update, context) -> int:
                 )
                 return CS.PAYMENT
     except Exception as e:
-
         update.callback_query.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def subcategory(update, context) -> int:
@@ -441,13 +463,13 @@ def subcategory(update, context) -> int:
     sheet_id = context.user_data["sheet_id"]
     entry_type = context.user_data["entry_type"]
     update.callback_query.answer()
-    if reply == BACK_TEXT:
-        msg, markup_list = get_category_text(sheet_id, entry_type)
-        update.callback_query.edit_message_text(
-            msg, reply_markup=utils.create_inline_markup(markup_list)
-        )
-        return CS.CATEGORY
     try:
+        if reply == BACK_TEXT:
+            msg, markup_list = get_category_text(sheet_id, entry_type)
+            update.callback_query.edit_message_text(
+                msg, reply_markup=utils.create_inline_markup(markup_list)
+            )
+            return CS.CATEGORY
         context.user_data["category"] = f'{context.user_data["category"]} - {reply}'
         update.callback_query.edit_message_text(
             f'Category type: {context.user_data["category"]}', reply_markup=None
@@ -458,11 +480,10 @@ def subcategory(update, context) -> int:
         )
         return CS.PAYMENT
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def payment(update, context) -> int:
@@ -490,26 +511,26 @@ def payment(update, context) -> int:
             else:
                 log_transaction(context.user_data, update)
             update.callback_query.message.reply_text("Transaction logged.")
-            return ConversationHandler.END
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def subpayment(update, context) -> int:
     reply = update.callback_query.data
     update.callback_query.answer()
     sheet_id = context.user_data["sheet_id"]
-    if reply == BACK_TEXT:
-        payment_list = get_payment_text(sheet_id)
-        update.callback_query.edit_message_text(
-            DEFAULT_PAYMENT_TEXT, reply_markup=utils.create_inline_markup(payment_list)
-        )
-        return CS.PAYMENT
+
     try:
+        if reply == BACK_TEXT:
+            payment_list = get_payment_text(sheet_id)
+            update.callback_query.edit_message_text(
+                DEFAULT_PAYMENT_TEXT,
+                reply_markup=utils.create_inline_markup(payment_list),
+            )
+            return CS.PAYMENT
         context.user_data["payment"] = f'{context.user_data["payment"]} - {reply}'
         update.callback_query.edit_message_text(
             f'Payment type: {context.user_data["payment"]}', reply_markup=None
@@ -519,14 +540,11 @@ def subpayment(update, context) -> int:
         else:
             log_transaction(context.user_data, update)
         update.callback_query.message.reply_text("Transaction logged.")
-        return ConversationHandler.END
-
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def log_transaction(user_data, update):
@@ -553,46 +571,51 @@ def log_transaction(user_data, update):
     row_data = [entry_type, price, remarks, category, payment]
 
     msg = ""
-    # start new date if date elapsed
-    if day_tracker != day:
-        msg = f"New entry for {day} {month}"
-        prev_month = month
-        # this should fix the bug regarding if first day of month not keyed in, but not tested
-        if day == 1 | day < day_tracker:
-            prev_month = (current_datetime - dt.timedelta(days=1)).strftime("%b")
-        # update prev day
-        msg = f"{msg}\nCreating sum for day {day_tracker}"
-        gs.update_prev_day(sheet_id, prev_month, first_row)
-        if day == 1 | day < day_tracker:
-            new_row = 4
-            first_row = 5
-            gs.update_rows(sheet_id, 1, new_row, first_row)
-        else:
-            new_row = gs.get_last_entered_row(sheet_id, month)
+    try:
+        # start new date if date elapsed
+        if day_tracker != day:
+            msg = f"New entry for {day} {month}"
+            prev_month = month
+            # this should fix the bug regarding if first day of month not keyed in, but not tested
+            if day == 1 | day < day_tracker:
+                prev_month = (current_datetime - dt.timedelta(days=1)).strftime("%b")
+            # update prev day
+            msg = f"{msg}\nCreating sum for day {day_tracker}"
+            gs.update_prev_day(sheet_id, prev_month, first_row)
+            if day == 1 | day < day_tracker:
+                new_row = 4
+                first_row = 5
+                gs.update_tracker_values(sheet_id, 1, new_row, first_row)
+            else:
+                new_row = gs.get_last_entered_row(sheet_id, month)
+                first_row = new_row + 1
+                gs.update_tracker_values(sheet_id, day, new_row, first_row)
+            if update.callback_query and update.callback_query.message:
+                update.callback_query.message.reply_text(msg)
+            elif update.message:
+                update.message.reply_text(msg)
+
+            transport_row_tracker = new_row
             first_row = new_row + 1
-            gs.update_rows(sheet_id, day, new_row, first_row)
-        if update.callback_query and update.callback_query.message:
-            update.callback_query.message.reply_text(msg)
-        elif update.message:
-            update.message.reply_text(msg)
+            other_row_tracker = new_row
+            # enter date into cell
+            gs.create_date(sheet_id, day, month, first_row)
 
-        transport_row_tracker = new_row
-        first_row = new_row + 1
-        other_row_tracker = new_row
-        # enter date into cell
-        gs.create_date(sheet_id, day, month, first_row)
-
-    # update row + 1
-    gs.row_incremental(sheet_id, entry_type)
-    if entry_type == EntryType.TRANSPORT:
-        transport_row_tracker += 1
-    else:
-        other_row_tracker += 1
-    # create entry
-    if entry_type == EntryType.TRANSPORT:
-        gs.create_entry(sheet_id, month, transport_row_tracker, row_data)
-    else:
-        gs.create_entry(sheet_id, month, other_row_tracker, row_data)
+        # update row + 1
+        gs.row_incremental(sheet_id, entry_type)
+        if entry_type == EntryType.TRANSPORT:
+            transport_row_tracker += 1
+        else:
+            other_row_tracker += 1
+        # create entry
+        if entry_type == EntryType.TRANSPORT:
+            gs.create_entry(sheet_id, month, transport_row_tracker, row_data)
+        else:
+            gs.create_entry(sheet_id, month, other_row_tracker, row_data)
+    except GoogleSheetError as e:
+        raise e
+    except Exception as e:
+        raise TelegramBotError(message="Error logging transaction", extra_info=str(e))
 
 
 def backlog_transaction(user_data, update):
@@ -605,20 +628,27 @@ def backlog_transaction(user_data, update):
     current_datetime = dt.datetime.now(timezone)
     month = current_datetime.strftime("%b")
 
-    # if backlog month is current month, need to move all one down
-    if backlog_month.title() == month:
-        gs.row_incremental_all(sheet_id)
+    try:
+        # if backlog month is current month, need to move all one down
+        if backlog_month.title() == month:
+            gs.row_incremental_all(sheet_id)
 
-    # user input data
-    entry_type = user_data["entry_type"]
-    payment = user_data["payment"]
-    price = user_data["price"]
-    category = user_data["category"]
-    remarks = user_data["remarks"]
-    row_data = [entry_type, price, remarks, category, payment]
+        # user input data
+        entry_type = user_data["entry_type"]
+        payment = user_data["payment"]
+        price = user_data["price"]
+        category = user_data["category"]
+        remarks = user_data["remarks"]
+        row_data = [entry_type, price, remarks, category, payment]
 
-    # create backlog entry
-    gs.create_backlog_entry(sheet_id, backlog_day, backlog_month, row_data)
+        # create backlog entry
+        gs.create_backlog_entry(sheet_id, backlog_day, backlog_month, row_data)
+    except GoogleSheetError as e:
+        raise e
+    except Exception as e:
+        raise TelegramBotError(
+            message="Error logging backlog transaction", extra_info=str(e)
+        )
 
 
 def cancel(update, context):
@@ -640,33 +670,39 @@ def add_transport(update, context):
             context.user_data["sheet_id"], EntryType.TRANSPORT
         )
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
         return ConversationHandler.END
+
     if not setting_list or not setting_list[0]:
         update.message.reply_text(QUICK_SETUP_TRANSPORT)
         return ConversationHandler.END
     else:
-        setting_list = gs.get_quick_add_list(
-            context.user_data["sheet_id"], context.user_data["entry_type"]
-        )
-        if len(setting_list) == 1:
-            payment, category = setting_list[0].split(",")
-            context.user_data["payment"] = payment
-            context.user_data["category"] = category
-            update.message.reply_text(
-                f"Quick Add Transport\nDefault Payment: {payment}\nDefault Type: {category}"
-                + "\n\nPlease enter as follow: [price],[start],[end]\n e.g. 2.11, Home, Work"
+        try:
+            setting_list = gs.get_quick_add_list(
+                context.user_data["sheet_id"], context.user_data["entry_type"]
             )
-            return CS.QUICK_ADD
-        else:
+            if len(setting_list) == 1:
+                payment, category = setting_list[0].split(",")
+                context.user_data["payment"] = payment
+                context.user_data["category"] = category
+                update.message.reply_text(
+                    f"Quick Add Transport\nDefault Payment: {payment}\nDefault Type: {category}"
+                    + "\n\nPlease enter as follow: [price],[start],[end]\n e.g. 2.11, Home, Work"
+                )
+                return CS.QUICK_ADD
+            else:
+                update.message.reply_text(
+                    "Quick Add Transport, please choose your category.",
+                    reply_markup=utils.create_inline_markup(setting_list),
+                )
+                return CS.QUICK_ADD_TRANSPORT
+        except Exception as e:
             update.message.reply_text(
-                "Quick Add Transport, please choose your category.",
-                reply_markup=utils.create_inline_markup(setting_list),
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
             )
-            return CS.QUICK_ADD_TRANSPORT
+        return ConversationHandler.END
 
 
 def add_others(update, context):
@@ -682,22 +718,27 @@ def add_others(update, context):
             context.user_data["sheet_id"], EntryType.OTHERS
         )
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
         return ConversationHandler.END
+
     if not setting_list or not setting_list[0]:
         update.message.reply_text(QUICK_SETUP_OTHER)
         return ConversationHandler.END
     else:
-        setting_list = gs.get_quick_add_list(
-            context.user_data["sheet_id"], context.user_data["entry_type"]
-        )
-        update.message.reply_text(
-            "Quick Add Others, please choose your category.",
-            reply_markup=utils.create_inline_markup(setting_list),
-        )
+        try:
+            setting_list = gs.get_quick_add_list(
+                context.user_data["sheet_id"], context.user_data["entry_type"]
+            )
+            update.message.reply_text(
+                "Quick Add Others, please choose your category.",
+                reply_markup=utils.create_inline_markup(setting_list),
+            )
+        except Exception as e:
+            update.message.reply_text(
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
+            )
     return CS.QUICK_ADD_CATEGORY
 
 
@@ -738,7 +779,6 @@ def quick_add(update, context) -> int:
             )
             return ConversationHandler.END
     except Exception as e:
-
         update.message.reply_text("Please follow the format and try again.")
         return CS.QUICK_ADD
 
@@ -758,7 +798,6 @@ def get_day_transaction(update, context):
         update.message.reply_text(GET_TRANSACTION_TEXT)
         return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
@@ -776,11 +815,10 @@ def get_overall(update, context):
         update.message.reply_text(GET_OVERALL_TEXT)
         return CS.HANDLE_GET_OVERALL
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def handle_get_transaction(update, context):
@@ -821,11 +859,10 @@ def handle_get_transaction(update, context):
             update.message.reply_text(GET_TRANSACTION_TEXT)
             return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def handle_get_overall(update, context):
@@ -860,11 +897,10 @@ def handle_get_overall(update, context):
             update.message.reply_text(GET_OVERALL_TEXT)
             return CS.HANDLE_GET_OVERALL
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def add_income(update, context):
@@ -876,13 +912,12 @@ def add_income(update, context):
             telegram_id, telegram_username
         )
         update.message.reply_text(ADD_INCOME_TEXT)
+        return CS.INCOME
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
-    return CS.INCOME
+    return ConversationHandler.END
 
 
 def income(update, context) -> int:
@@ -908,11 +943,10 @@ def income(update, context) -> int:
         )
         return CS.WORK_PLACE
     except Exception as e:
-
         update.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def work_place(update, context) -> int:
@@ -942,13 +976,11 @@ def cpf(update, context) -> int:
             update.callback_query.message.reply_text("Income has been added!")
         else:
             update.callback_query.message.reply_text(INCOME_LIMIT_TEXT)
-        return ConversationHandler.END
     except Exception as e:
-
         update.callback_query.message.reply_text(
             ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        return ConversationHandler.END
+    return ConversationHandler.END
 
 
 def backlog(update, context) -> int:
@@ -973,41 +1005,55 @@ def add_backlog_entry(update, context) -> int:
 
     telegram_id = update.effective_user.id
     telegram_username = update.effective_user.username
-    context.user_data["sheet_id"] = db.get_user_sheet_id(telegram_id, telegram_username)
-    update.message.reply_text(
-        ENTRY_TYPE_TEXT,
-        reply_markup=utils.create_inline_markup(
-            [entry_type.value for entry_type in EntryType]
-        ),
-    )
-    return CS.ENTRY
+    try:
+        context.user_data["sheet_id"] = db.get_user_sheet_id(
+            telegram_id, telegram_username
+        )
+        update.message.reply_text(
+            ENTRY_TYPE_TEXT,
+            reply_markup=utils.create_inline_markup(
+                [entry_type.value for entry_type in EntryType]
+            ),
+        )
+        return CS.ENTRY
+    except DatabaseError as e:
+        raise e
+    except Exception as e:
+        raise TelegramBotError(message="Error adding backlog entry", extra_info=str(e))
 
 
 def send_new_feature_message(context, new_feature_message):
-    users = db.get_all_user_id()
-    no_of_users = 0
-    no_of_error_users = 0
-    errors = []
+    try:
+        users = db.get_all_user_id()
+        no_of_users = 0
+        no_of_error_users = 0
+        errors = []
 
-    for user_id in users:
-        try:
-            context.bot.send_message(
-                chat_id=user_id,
-                text=new_feature_message,
-                parse_mode=ParseMode.HTML,
-            )
-            no_of_users += 1
-        except Exception as e:
+        for user_id in users:
             try:
-                chat = context.bot.get_chat(chat_id=user_id)
-                username = chat.username if chat.username else "?"
+                context.bot.send_message(
+                    chat_id=user_id,
+                    text=new_feature_message,
+                    parse_mode=ParseMode.HTML,
+                )
+                no_of_users += 1
             except Exception:
-                username = "?"
-            no_of_error_users += 1
-            errors.append(f"Username @{username} (ID: {user_id}): {e}")
+                try:
+                    chat = context.bot.get_chat(chat_id=user_id)
+                    username = chat.username if chat.username else "?"
+                except Exception:
+                    username = "?"
+                no_of_error_users += 1
+                errors.append(f"Username @{username} (ID: {user_id}): {e}")
 
-    error_message = "\n".join(errors)
-    return no_of_users, no_of_error_users, error_message
+        error_message = "\n".join(errors)
+        return no_of_users, no_of_error_users, error_message
+    except DatabaseError as e:
+        raise e
+    except Exception as e:
+        raise TelegramBotError(
+            message="Fail to send new feature message", extra_info=str(e)
+        )
 
 
 def notify_all(update, context):
@@ -1028,6 +1074,7 @@ def notify_all(update, context):
             f"Preview:\n{new_feature_message}",
             reply_markup=reply_markup,
         )
+    return CS.NOTIFICATION
 
 
 def notify_preview(update, context):
@@ -1037,17 +1084,27 @@ def notify_preview(update, context):
         text=f"Sending message to all in progress...",
         reply_markup=InlineKeyboardMarkup([]),
     )
-    if query.data == "confirm_send":
-        new_feature_message = query.message.text.partition("\n")[2]
-        no_of_users, no_of_error_users, error_message = send_new_feature_message(
-            context, new_feature_message
+    try:
+        if (
+            query.data == "confirm_send"
+            and str(update.effective_user.id) == MASTER_TELE_ID
+        ):
+            new_feature_message = query.message.text.partition("\n")[2]
+            no_of_users, no_of_error_users, error_message = send_new_feature_message(
+                context, new_feature_message
+            )
+
+            response = f"Message sent to {no_of_users} users.\n{no_of_error_users} users failed to receive the message."
+            if error_message:
+                response += f"\nErrors:\n{error_message}"
+            query.edit_message_text(text=response)
+        elif query.data == "cancel_send":
+            query.edit_message_text(text="Message sending cancelled.")
+    except Exception as e:
+        query.edit_message_text(
+            text=ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e))
         )
-        response = f"Message sent to {no_of_users} users.\n{no_of_error_users} users failed to receive the message."
-        if error_message:
-            response += f"\nErrors:\n{error_message}"
-        query.edit_message_text(text=response)
-    elif query.data == "cancel_send":
-        query.edit_message_text(text="Message sending cancelled.")
+    return ConversationHandler.END
 
 
 def setup_handlers(dispatcher):
@@ -1082,6 +1139,11 @@ def setup_handlers(dispatcher):
         CS.QUICK_ADD_TRANSPORT: [CallbackQueryHandler(quick_add_transport)],
     }
 
+    # Notify all users (admin)
+    notification_states = {
+        CS.NOTIFICATION: [CallbackQueryHandler(notify_preview)],
+    }
+
     # Retrieve transaction-related states and handlers
     get_transaction_states = {
         CS.HANDLE_GET_TRANSACTION: [
@@ -1108,6 +1170,7 @@ def setup_handlers(dispatcher):
             CommandHandler("getdaytransaction", get_day_transaction),
             CommandHandler("getoverall", get_overall),
             CommandHandler("backlog", backlog),
+            CommandHandler("notifyall", notify_all),
         ],
         states={
             CS.SET_UP: [MessageHandler(Filters.text & ~Filters.command, set_up)],
@@ -1117,6 +1180,7 @@ def setup_handlers(dispatcher):
             **quick_add_states,
             **get_transaction_states,
             **add_income_states,
+            **notification_states,
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
@@ -1124,9 +1188,3 @@ def setup_handlers(dispatcher):
 
     help_handler = CommandHandler("help", help)
     dispatcher.add_handler(help_handler)
-
-    # Notify all users (admin)
-    notify_all_handler = CommandHandler("notifyall", notify_all)
-
-    dispatcher.add_handler(CallbackQueryHandler(notify_preview))
-    dispatcher.add_handler(notify_all_handler)
