@@ -1080,15 +1080,16 @@ def notify_all(update, context):
 def notify_preview(update, context):
     query = update.callback_query
     query.answer()
-    query.edit_message_text(
-        text=f"Sending message to all in progress...",
-        reply_markup=InlineKeyboardMarkup([]),
-    )
+    
     try:
         if (
             query.data == "confirm_send"
             and str(update.effective_user.id) == MASTER_TELE_ID
         ):
+            query.edit_message_text(
+                text=f"Sending message to all in progress...",
+                reply_markup=InlineKeyboardMarkup([]),
+            )
             new_feature_message = query.message.text.partition("\n")[2]
             no_of_users, no_of_error_users, error_message = send_new_feature_message(
                 context, new_feature_message
