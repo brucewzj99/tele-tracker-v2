@@ -2,6 +2,7 @@ import os
 
 GOOGLE_API_EMAIL = os.getenv("GOOGLE_API_EMAIL")
 GOOGLE_TEMPLATE = "http://tinyurl.com/ymm-2024-expense-sheet"
+GOOGLE_FORM = "https://forms.gle/kXySdv3Wjv7QmSug7"
 SETUP_TEXT = (
     "Please set up your Google sheet by following the steps below.\n\n"
     + f"1. Head over to <a href='{GOOGLE_TEMPLATE}'>Expense Tracker Template</a>\n"
@@ -14,7 +15,7 @@ SETUP_TEXT = (
     + "6. Copy your entire Google Sheet URL and send it over\n"
     + "Example: https://docs.google.com/spreadsheets/d/abcd1234/edit\n"
 )
-ERROR_TEXT = "There seems to be an error, please try again later. If the problem persists, please report it at github.com/brucewzj99/tele-tracker-v2/issues\nwith the error message.\n"
+ERROR_TEXT = f"There seems to be an error, please try again later. If the problem persists, please report it over at this <a href='{GOOGLE_FORM}'>form.</a>\n"
 SUCCESS_LINK_TEXT = "Google sheet successfully linked! Please proceed to configure your Dropdown sheet.\nOnce completed, type /addentry to add your first entry!"
 GSHEET_ERROR_TEXT = f"There seems to be an error linking your google sheet, have you shared your Google Sheet with {GOOGLE_API_EMAIL} yet?"
 GSHEET_WRONG_TEXT = (
@@ -49,13 +50,14 @@ HELP_TEXT = (
     + "Remember to configure your Dropdown sheet to get started on this bot.\n\n"
     + "/config - Update Sheet Settings\n"
     + "/addentry - Add Expense Entry\n"
+    + "/backlog - Add transaction in the past\n"
     + "/addtransport - Quick Add Transport Entry\n"
     + "/addothers - Quick Add Other Entry\n"
     + "/addincome - Add Income Entry\n"
     + "/getdaytransaction - Retrieve transaction from dates\n"
     + "/getoverall - Retrieve overall transaction for a month\n"
     + "/cancel - Cancel Conversation\n"
-    + "\nTo report bugs or request any features, please create a issue at https://github.com/brucewzj99/tele-tracker-v2/issues\n"
+    + f"\nTo report bugs, give your feedback or request any features, please do so via this <a href='{GOOGLE_FORM}'>form.</a>\n"
     + "\nYou can support me by buying me a coffee at https://ko-fi.com/brucewzj"
 )
 
