@@ -1,4 +1,12 @@
 # Release Notes
+## Version 2.4.1.2 - Date 12 May 2024
+### Bug Fix 🛠️
+- Error handling for `/notifyall` command
+- Add users count for `/notifyall` command
+
+### For Developer 🧑‍💻
+- Logging of error info message
+
 ## Version 2.4.1 - Date 12 May 2024
 ### Enhancement 🔥
 - Added google form for reporting bugs, feedbacks and feature requests
@@ -33,7 +41,7 @@
 - Added test for database module
 
 ## Version 2.3.3 - Date 1 May 2024
-### Minor Fix 🛠️
+### Bug Fix 🛠️
 - Add datetime and username for logging purposes
 - Add more message to help command
 

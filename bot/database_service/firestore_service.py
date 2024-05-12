@@ -104,3 +104,12 @@ class FirestoreService:
             return user_ids
         except Exception as e:
             raise DatabaseError(message="Error getting all user ids", extra_info=str(e))
+
+    # Get user count
+    def get_user_count(self):
+        try:
+            users_ref = self.db.collection(self.collection_name)
+            user_count = len([user.id for user in users_ref.stream()])
+            return user_count
+        except Exception as e:
+            raise DatabaseError(message="Error getting user count", extra_info=str(e))
