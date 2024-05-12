@@ -10,6 +10,7 @@ class BaseError(Exception):
         self.message = message
         self.extra_info = extra_info
         self.error_class = error_class
+        logging.error(f"{error_class}: {message} {extra_info}")
         super().__init__(f"{self.error_class}: {self.message}")
 
 class GoogleSheetError(BaseError):

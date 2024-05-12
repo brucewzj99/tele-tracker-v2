@@ -1037,7 +1037,7 @@ def send_new_feature_message(context, new_feature_message):
                     parse_mode=ParseMode.HTML,
                 )
                 no_of_users += 1
-            except Exception:
+            except Exception as e:
                 try:
                     chat = context.bot.get_chat(chat_id=user_id)
                     username = chat.username if chat.username else "?"
@@ -1062,10 +1062,10 @@ def notify_all(update, context):
         if not new_feature_message:
             update.message.reply_text("Please provide a message to send.")
             return
-
+        no_of_users = db.get_user_count()
         keyboard = [
             [
-                InlineKeyboardButton("Confirm Send", callback_data="confirm_send"),
+                InlineKeyboardButton(f"Send to {no_of_users} users", callback_data="confirm_send"),
                 InlineKeyboardButton("Cancel", callback_data="cancel_send"),
             ]
         ]
