@@ -1,4 +1,8 @@
 # Release Notes
+## Version 2.4.1 - Date 12 May 2024
+### Enhancement 🔥
+- Added google form for reporting bugs, feedbacks and feature requests
+
 ## Version 2.4 - Date 6 May 2024
 ### Enhancement 🔥
 - Clearer error messages for users
