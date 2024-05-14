@@ -167,12 +167,8 @@ def create_entry(spreadsheet_id, month, row_tracker, row_data, backlog_day=None)
         data = [None] * 5 + data
 
     # prepend data
-    if backlog_day:
-        data = [backlog_day] + [None] + data
-        body = {"values": [data]}
-    else:
-        data = [None] + [None] + data
-        body = {"values": [data]}
+    data = [backlog_day] + [None] + data if backlog_day else [None] * 2 + data
+    body = {"values": [data]}
 
     # creating the entry in google sheet
     try:
