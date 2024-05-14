@@ -1,4 +1,11 @@
 # Release Notes
+## Version 2.4.2 - Date 14 May 2024
+### Bug Fix 🛠️
+- Fix bug for backlog entry when backlog date doesn't exist
+
+### For Developer 🧑‍💻
+- Added new dev_testfunction to quickly test and debug functions
+
 ## Version 2.4.1.2 - Date 12 May 2024
 ### Bug Fix 🛠️
 - Error handling for `/notifyall` command

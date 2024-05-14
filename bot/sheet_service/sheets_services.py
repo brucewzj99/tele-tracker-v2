@@ -164,8 +164,7 @@ class SheetManager:
         values = result.get("values", [])
         return len(values)
 
-    # to be rename as update_prev_day_total
-    def update_prev_day(self, spreadsheet_id, month, first_row, last_row=0):
+    def update_day_total_sum(self, spreadsheet_id, month, first_row, last_row=0):
         """
         This method update the total amount spend for the previous day
         """
