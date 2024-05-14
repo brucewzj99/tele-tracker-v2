@@ -5,6 +5,11 @@ import os
 import json
 from bot.error_handler import GoogleSheetError
 
+import datetime as dt
+import pytz
+
+timezone = pytz.timezone("Asia/Singapore")
+
 GOOGLE_JSON = os.getenv("GOOGLE_JSON")
 google_service = json.loads(GOOGLE_JSON)
 
@@ -98,7 +103,7 @@ def get_sub_dropdown_value(spreadsheet_id, main_value, entry_type):
         raise GoogleSheetError(message=f"Error with retrieving values for sub dropdown value for entrytype: {entry_type}", extra_info=str(e))
 
 
-def update_prev_day(spreadsheet_id, month, first_row, last_row=0):
+def update_day_total_sum(spreadsheet_id, month, first_row, last_row=0):
     month = month.title()
     try:
         if last_row == 0:
@@ -148,26 +153,25 @@ def create_date(spreadsheet_id, day, month, first_row):
         raise GoogleSheetError(message=f"Fail to create new day for {day} {month}", extra_info=str(e))
 
 
-def create_entry(spreadsheet_id, month, row_tracker, row_data):
-    entry_type = row_data[0]
-    price = row_data[1].strip()
-    remarks = row_data[2].strip()
-    category = row_data[3].strip()
-    payment = row_data[4].strip()    
+def create_entry(spreadsheet_id, month, row_tracker, row_data, backlog_day=None):
+    entry_type, price, remarks, category, payment = (item.strip() if isinstance(item, str) else item for item in row_data)
     month = month.title()
-
-
     data = [price, remarks, category, payment]
-    sheet_column_start = "H"
+
+    sheet_column_start = "A"
     sheet_column_end = "K"
     if entry_type == EntryType.TRANSPORT:
         remarks_list = [remark.strip() for remark in remarks.split(",")]
-        sheet_column_start = "C"
-        sheet_column_end = "G"
         data = [price] + remarks_list + [category, payment]
+    else:
+        data = [None] * 5 + data
 
+    # prepend data
+    data = [backlog_day] + [None] + data if backlog_day else [None] * 2 + data
+    body = {"values": [data]}
+
+    # creating the entry in google sheet
     try:
-        body = {"values": [data]}
         range_name = (
             f"{month}!{sheet_column_start}{row_tracker}:{sheet_column_end}{row_tracker}"
         )
@@ -196,89 +200,78 @@ def get_sheet_id_by_title(spreadsheet_id, title_to_find):
     except Exception as e:
         raise GoogleSheetError(message=f"Fail to retrieve sheet id by title: {title_to_find}", extra_info=str(e))
 
+def move_row_down(spreadsheet_id, sheet_id, first_row_to_move, last_row_to_move):
+    try:
+        requests = [
+            {
+                "copyPaste": {
+                    "source": {
+                        "sheetId": sheet_id,
+                        "startRowIndex": first_row_to_move - 1,
+                        "endRowIndex": last_row_to_move,
+                        "startColumnIndex": start_column_index,
+                        "endColumnIndex": end_column_index,
+                    },
+                    "destination": {
+                        "sheetId": sheet_id,
+                        "startRowIndex": first_row_to_move,
+                        "endRowIndex": last_row_to_move + 1,
+                        "startColumnIndex": start_column_index,
+                        "endColumnIndex": end_column_index,
+                    },
+                    "pasteType": "PASTE_NORMAL",
+                    "pasteOrientation": "NORMAL",
+                }
+            }
+        ]
+        sheets_api.spreadsheets().batchUpdate(
+            spreadsheetId=spreadsheet_id, body={"requests": requests}
+        ).execute()
+    except Exception as e:
+        raise GoogleSheetError(message=f"Fail to move existing entry down", extra_info=str(e))
 
 def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
-    entry_type = row_data[0]
-    price = row_data[1].strip()
-    remarks = row_data[2].strip()
-    category = row_data[3].strip()
-    payment = row_data[4].strip()
     backlog_month = backlog_month.title()
-
     try:
         day_first_entry_index = get_day_first_entry_index(
             spreadsheet_id, backlog_month, backlog_day
         )
-        row_to_move = int(get_first_row_to_move(spreadsheet_id, backlog_month, backlog_day))
+        first_row_to_move = int(get_first_row_to_move(spreadsheet_id, backlog_month, backlog_day))
         last_row_to_move = int(get_last_entered_row(spreadsheet_id, backlog_month))
-        new_entry_row = row_to_move
+        new_entry_row = first_row_to_move
         sheet_id = get_sheet_id_by_title(spreadsheet_id, backlog_month.title())
 
-        if row_to_move is None:
-            new_entry_row = last_row_to_move + 1
-        else:
-            requests = [
-                {
-                    "copyPaste": {
-                        "source": {
-                            "sheetId": sheet_id,
-                            "startRowIndex": row_to_move - 1,
-                            "endRowIndex": last_row_to_move,
-                            "startColumnIndex": start_column_index,
-                            "endColumnIndex": end_column_index,
-                        },
-                        "destination": {
-                            "sheetId": sheet_id,
-                            "startRowIndex": row_to_move,
-                            "endRowIndex": last_row_to_move + 1,
-                            "startColumnIndex": start_column_index,
-                            "endColumnIndex": end_column_index,
-                        },
-                        "pasteType": "PASTE_NORMAL",
-                        "pasteOrientation": "NORMAL",
-                    }
-                }
-            ]
-            try:
-                sheets_api.spreadsheets().batchUpdate(
-                    spreadsheetId=spreadsheet_id, body={"requests": requests}
-                ).execute()
+        if last_row_to_move >= first_row_to_move:
+            move_row_down(spreadsheet_id, sheet_id, first_row_to_move, last_row_to_move)
+            clear_range = f"{backlog_month}!A{new_entry_row}:K{new_entry_row}"
+            sheets_api.spreadsheets().values().clear(
+                spreadsheetId=spreadsheet_id, range=clear_range
+            ).execute()
 
-                clear_range = f"{backlog_month}!A{new_entry_row}:K{new_entry_row}"
-                sheets_api.spreadsheets().values().clear(
-                    spreadsheetId=spreadsheet_id, range=clear_range
-                ).execute()
-                
-                update_prev_day(spreadsheet_id, backlog_month, day_first_entry_index, new_entry_row)
-            except GoogleSheetError as e:
-                raise e
-            except Exception as e:
-                raise GoogleSheetError(message=f"Fail to move existing entry down", extra_info=str(e))
-
+        # If there is no entry for the day, create a new date
         if day_first_entry_index is None:
-            create_date(spreadsheet_id, backlog_day, backlog_month, new_entry_row)
+            create_entry(spreadsheet_id, backlog_month, new_entry_row, row_data, backlog_day)
             day_first_entry_index = new_entry_row
 
-        data = [price, remarks, category, payment]
-        sheet_column_start = "H"
-        sheet_column_end = "K"
-        if entry_type == EntryType.TRANSPORT:
-            remarks_list = [remark.strip() for remark in remarks.split(",")]
-            sheet_column_start = "C"
-            sheet_column_end = "G"
-            data = [price] + remarks_list + [category, payment]
+        else:
+            # Create the new entry in the new entry row and update day total
+            create_entry(spreadsheet_id, backlog_month, new_entry_row, row_data)
+        update_day_total_sum(spreadsheet_id, backlog_month, day_first_entry_index, new_entry_row)
 
-        try:
-            body = {"values": [data]}
-            range_name = f"{backlog_month}!{sheet_column_start}{new_entry_row}:{sheet_column_end}{new_entry_row}"
-            sheets_api.spreadsheets().values().update(
-                spreadsheetId=spreadsheet_id,
-                range=range_name,
-                valueInputOption="USER_ENTERED",
-                body=body,
-            ).execute()
-        except Exception as e:
-            raise GoogleSheetError(message=f"Fail to create backlog entry", extra_info=str(e))
+        # datatime data
+        current_datetime = dt.datetime.now(timezone)
+        month = current_datetime.strftime("%b")
+        
+        # if backlog month is current month, need to update tracker to reflect backlog changes
+        if backlog_month.title() == month:
+            if last_row_to_move < first_row_to_move and day_first_entry_index == new_entry_row:
+                update_tracker_values(spreadsheet_id, backlog_day, new_entry_row-1, new_entry_row)
+            if last_row_to_move < first_row_to_move:
+                row_incremental(spreadsheet_id, EntryType.OTHERS)
+            else:
+                row_incremental_all(spreadsheet_id)
+
+
     except GoogleSheetError as e:
         raise e
     except Exception as e:

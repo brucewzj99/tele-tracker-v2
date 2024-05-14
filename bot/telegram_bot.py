@@ -105,7 +105,7 @@ def set_up(update, context) -> int:
                     prev_month = (current_datetime - dt.timedelta(days=1)).strftime(
                         "%b"
                     )
-                    gs.update_prev_day(sheet_id, prev_month, first_row)
+                    gs.update_day_total_sum(sheet_id, prev_month, first_row)
                     new_row = gs.get_last_entered_row(sheet_id, month)
                     first_row = new_row + 1
                     gs.update_tracker_values(sheet_id, day, new_row, first_row)
@@ -581,7 +581,7 @@ def log_transaction(user_data, update):
                 prev_month = (current_datetime - dt.timedelta(days=1)).strftime("%b")
             # update prev day
             msg = f"{msg}\nCreating sum for day {day_tracker}"
-            gs.update_prev_day(sheet_id, prev_month, first_row)
+            gs.update_day_total_sum(sheet_id, prev_month, first_row)
             if day == 1 | day < day_tracker:
                 new_row = 4
                 first_row = 5
@@ -624,15 +624,8 @@ def backlog_transaction(user_data, update):
     backlog_day = user_data["backlog_day"]
     backlog_month = user_data["backlog_month"]
 
-    # datatime data
-    current_datetime = dt.datetime.now(timezone)
-    month = current_datetime.strftime("%b")
 
     try:
-        # if backlog month is current month, need to move all one down
-        if backlog_month.title() == month:
-            gs.row_incremental_all(sheet_id)
-
         # user input data
         entry_type = user_data["entry_type"]
         payment = user_data["payment"]
@@ -643,6 +636,7 @@ def backlog_transaction(user_data, update):
 
         # create backlog entry
         gs.create_backlog_entry(sheet_id, backlog_day, backlog_month, row_data)
+        
     except GoogleSheetError as e:
         raise e
     except Exception as e:
