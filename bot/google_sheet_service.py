@@ -237,14 +237,13 @@ def move_row_down(spreadsheet_id, sheet_id, first_row_to_move, last_row_to_move)
 def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
     backlog_month = backlog_month.title()
     try:
-        try:
-            day_first_entry_index = get_day_first_entry_index(
-                spreadsheet_id, backlog_month, backlog_day
-            )
-            first_row_to_move = int(get_first_row_to_move(spreadsheet_id, backlog_month, backlog_day))
-            last_row_to_move = int(get_last_entered_row(spreadsheet_id, backlog_month))
-            new_entry_row = first_row_to_move
-            sheet_id = get_sheet_id_by_title(spreadsheet_id, backlog_month.title())
+        day_first_entry_index = get_day_first_entry_index(
+            spreadsheet_id, backlog_month, backlog_day
+        )
+        first_row_to_move = int(get_first_row_to_move(spreadsheet_id, backlog_month, backlog_day))
+        last_row_to_move = int(get_last_entered_row(spreadsheet_id, backlog_month))
+        new_entry_row = first_row_to_move
+        sheet_id = get_sheet_id_by_title(spreadsheet_id, backlog_month.title())
 
         if last_row_to_move >= first_row_to_move:
             move_row_down(spreadsheet_id, sheet_id, first_row_to_move, last_row_to_move)
@@ -266,7 +265,7 @@ def create_backlog_entry(spreadsheet_id, backlog_day, backlog_month, row_data):
         # datatime data
         current_datetime = dt.datetime.now(timezone)
         month = current_datetime.strftime("%b")
-
+        
         # if backlog month is current month, need to update tracker to reflect backlog changes
         if backlog_month.title() == month:
             if last_row_to_move < first_row_to_move and day_first_entry_index == new_entry_row:
