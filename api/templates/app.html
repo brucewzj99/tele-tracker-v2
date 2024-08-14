@@ -27,10 +27,12 @@
         font-size: 16px;
         margin: 0;
         line-height: 1.5;
-        height: 100%;
+        min-height: 100%;
         text-align: left;
         color: #fefefe;
         background: #212121;
+        display: flex;
+        flex-direction: column;
       }
       a {
         color:#65efa4;
@@ -42,7 +44,7 @@
       .container {
         display: table;
         max-width: 80%;
-        height: 100%;
+        flex-grow: 1; /* Ensures the container takes up all available space */
         margin: auto;
       }
       .child {
@@ -66,6 +68,22 @@
         width: 100px; 
         height: auto; 
       }
+      .footer {
+        text-align: center;
+        padding: 20px 0;
+        font-size: 14px;
+        background-color: #333;
+        color: #bbb;
+      }
+      .footer a {
+        color: #6ee7b7;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .footer a:hover {
+        color: #34D399;
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
@@ -77,6 +95,15 @@
         <p>You can access the bot using this <a href="https://t.me/telefinance_tracker_bot">link</a>.
         <br>For instructions on how to use the bot, please refer to the <a href="https://github.com/brucewzj99/tele-tracker-v2/wiki/Getting-Started">GitHub Wiki</a>.</p>
         <p>If you would like to support my work, you can do so at the following links:</p>
-        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#2f8a5b', 'H2H8LN59H');kofiwidget2.draw();</script>     </div>
+        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+        <script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#2f8a5b', 'H2H8LN59H');kofiwidget2.draw();</script>
+      </div>
+    </div>
+    
+    <!-- Footer Section -->
+    <footer class="footer">
+      <p>Check out my other project: <a href="https://cardfit.me" target="_blank">CardFit</a> – Unlock the potential of your spending!</p>
+      <p>&copy; 2024 Bruce Wang. All rights reserved.</p>
+    </footer>
   </body>
 </html>
