@@ -99,7 +99,8 @@ class FirestoreService:
     # Get all user IDs
     def get_all_user_id(self):
         try:
-            users_ref = self.db.collection(self.collection_name)
+            two_months_ago = datetime.now() - timedelta(days=45)
+            users_ref = self.db.collection(self.collection_name).where('last_accessed', '>=', two_months_ago)
             user_ids = [int(user.id) for user in users_ref.stream()]
             return user_ids
         except Exception as e:
