@@ -1,8 +1,8 @@
 import logging
 
 
-logging.basicConfig(level=logging.ERROR, filename='telegram_bot.log',
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+# logging.basicConfig(level=logging.ERROR, filename='telegram_bot.log',
+#                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 class BaseError(Exception):
     """Base class for other exceptions"""
@@ -10,7 +10,7 @@ class BaseError(Exception):
         self.message = message
         self.extra_info = extra_info
         self.error_class = error_class
-        logging.error(f"{error_class}: {message} {extra_info}")
+        # logging.error(f"{error_class}: {message} {extra_info}")
         print(f"{error_class}: {message} {extra_info}")
         super().__init__(f"{self.error_class}: {self.message}")
 
