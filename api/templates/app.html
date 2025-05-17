@@ -84,26 +84,60 @@
         color: #34D399;
         text-decoration: underline;
       }
+      .notification-bar {
+        background-color: #facc15; /* bright yellow */
+        color: #1f2937; /* dark gray text */
+        padding: 12px 20px;
+        font-size: 14px;
+        text-align: center;
+        border-bottom: 2px solid #f59e0b; /* orange accent for separation */
+        position: relative;
+        z-index: 1000;
+      }
+      .notification-bar a {
+        color: #1e40af;
+        font-weight: bold;
+      }
+      .notification-bar a:hover {
+        text-decoration: underline;
+      }
+
     </style>
   </head>
   <body>
+<div class="notification-bar">
+  ⚠️ Heads up! This bot is no longer actively maintained due to upcoming platform changes.
+  You can <a href="https://teleexpense.vercel.app" target="_blank">try the new version here</a>,
+  or <a href="https://vercel.com/changelog/legacy-build-image-is-being-deprecated-on-august-1-2025-4rKrNPKXA3yiCV9c9h2Z5k" target="_blank">read more</a>.
+</div>
+
+
     <div class="container">
       <div class="child">
         <img src="https://github.com/brucewzj99/tele-tracker-v2/blob/main/api/templates/logo.png?raw=true" alt="Logo" class="logo" />
-        <h1 class="title">tele-tracker-bot</h1>
+        <h1 class="title">TeleFinance Tracker Bot</h1>
         <h2 class="subtitle">A python telegram bot to help track expenses!</h2>
         <p>You can access the bot using this <a href="https://t.me/telefinance_tracker_bot">link</a>.
         <br>For instructions on how to use the bot, please refer to the <a href="https://github.com/brucewzj99/tele-tracker-v2/wiki/Getting-Started">GitHub Wiki</a>.</p>
         <p>If you would like to support my work, you can do so at the following links:</p>
         <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
         <script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#2f8a5b', 'H2H8LN59H');kofiwidget2.draw();</script>
+          
       </div>
     </div>
     
     <!-- Footer Section -->
+
     <footer class="footer">
-      <p>Check out my other project: <a href="https://cardfit.me" target="_blank">CardFit</a> – Unlock the potential of your spending!</p>
-      <p>&copy; 2024 Bruce Wang. All rights reserved.</p>
+      &copy; <span id="year"></span> TeleFinance Tracker — Built by&nbsp;<a href="https://www.brucewzj.com" target="_blank">Bruce Wang</a> |
+      Check out&nbsp;<a href="https://teleexpense.vercel.app/" target="_blank">TeleExpense Tracker</a> |
+      Check out&nbsp;<a href="https://glimpse-mi.vercel.app/" target="_blank">Glimpse Mi</a>
     </footer>
+    
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
   </body>
+  
 </html>

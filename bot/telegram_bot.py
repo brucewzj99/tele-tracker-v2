@@ -74,7 +74,8 @@ def start(update, context):
             return CS.SET_UP
     except Exception as e:
         update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -126,11 +127,13 @@ def set_up(update, context) -> int:
 
         except GoogleSheetError as e:
             update.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+                parse_mode=ParseMode.HTML,
             )
         except DatabaseError as e:
             update.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+                parse_mode=ParseMode.HTML,
             )
         except Exception as e:
             update.message.reply_text(GSHEET_ERROR_TEXT)
@@ -207,7 +210,8 @@ def config_handler(update, context) -> int:
             return CS.CONFIG_SETUP
         except Exception as e:
             update.callback_query.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+                parse_mode=ParseMode.HTML,
             )
         return ConversationHandler.END
 
@@ -228,7 +232,8 @@ def config_setup(update, context) -> int:
             return CS.CONFIG_CATEGORY
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
         return ConversationHandler.END
     update.callback_query.edit_message_text(END_TEXT, reply_markup=None)
@@ -264,7 +269,8 @@ def config_category(update, context) -> int:
                 return CS.CONFIG_SUBCATEGORY
     except Exception as e:
         update.callback_query.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
         return ConversationHandler.END
 
@@ -288,7 +294,8 @@ def config_subcategory(update, context) -> int:
         return CS.CONFIG_PAYMENT
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
         return ConversationHandler.END
 
@@ -309,7 +316,8 @@ def config_payment(update, context) -> int:
             return CS.CONFIG_SUBPAYMENT
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
         return ConversationHandler.END
 
@@ -336,7 +344,8 @@ def config_subpayment(update, context) -> int:
         return ConversationHandler.END
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
         return ConversationHandler.END
 
@@ -358,7 +367,8 @@ def add_entry(update, context):
         return CS.ENTRY
     except Exception as e:
         update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
         return ConversationHandler.END
 
@@ -407,7 +417,8 @@ def remarks(update: Update, context) -> int:
         return CS.CATEGORY
     except Exception as e:
         update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -453,7 +464,8 @@ def category(update, context) -> int:
                 return CS.PAYMENT
     except Exception as e:
         update.callback_query.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -481,7 +493,8 @@ def subcategory(update, context) -> int:
         return CS.PAYMENT
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -513,7 +526,8 @@ def payment(update, context) -> int:
             update.callback_query.message.reply_text("Transaction logged.")
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -542,7 +556,8 @@ def subpayment(update, context) -> int:
         update.callback_query.message.reply_text("Transaction logged.")
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -577,15 +592,17 @@ def log_transaction(user_data, update):
             msg = f"New entry for {day} {month}"
             prev_month = month
             # this should fix the bug regarding if first day of month not keyed in, but not tested
-            if day == 1 | day < day_tracker:
-                prev_month = (current_datetime - dt.timedelta(days=1)).strftime("%b")
+            if day == 1 or day < day_tracker:
+                first_of_this_month = current_datetime.replace(day=1)
+                last_of_prev_month = first_of_this_month - dt.timedelta(days=1)
+                prev_month = last_of_prev_month.strftime("%b")
             # update prev day
             msg = f"{msg}\nCreating sum for day {day_tracker}"
             gs.update_day_total_sum(sheet_id, prev_month, first_row)
-            if day == 1 | day < day_tracker:
+            if day == 1 or day < day_tracker:
                 new_row = 4
                 first_row = 5
-                gs.update_tracker_values(sheet_id, 1, new_row, first_row)
+                gs.update_tracker_values(sheet_id, day, new_row, first_row)
             else:
                 new_row = gs.get_last_entered_row(sheet_id, month)
                 first_row = new_row + 1
@@ -624,7 +641,6 @@ def backlog_transaction(user_data, update):
     backlog_day = user_data["backlog_day"]
     backlog_month = user_data["backlog_month"]
 
-
     try:
         # user input data
         entry_type = user_data["entry_type"]
@@ -636,7 +652,7 @@ def backlog_transaction(user_data, update):
 
         # create backlog entry
         gs.create_backlog_entry(sheet_id, backlog_day, backlog_month, row_data)
-        
+
     except GoogleSheetError as e:
         raise e
     except Exception as e:
@@ -665,7 +681,8 @@ def add_transport(update, context):
         )
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
         return ConversationHandler.END
 
@@ -694,7 +711,8 @@ def add_transport(update, context):
                 return CS.QUICK_ADD_TRANSPORT
         except Exception as e:
             update.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+                parse_mode=ParseMode.HTML,
             )
         return ConversationHandler.END
 
@@ -713,7 +731,8 @@ def add_others(update, context):
         )
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
         return ConversationHandler.END
 
@@ -731,7 +750,8 @@ def add_others(update, context):
             )
         except Exception as e:
             update.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+                parse_mode=ParseMode.HTML,
             )
     return CS.QUICK_ADD_CATEGORY
 
@@ -769,7 +789,8 @@ def quick_add(update, context) -> int:
             return ConversationHandler.END
         except Exception as e:
             update.message.reply_text(
-                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+                ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+                parse_mode=ParseMode.HTML,
             )
             return ConversationHandler.END
     except Exception as e:
@@ -793,7 +814,8 @@ def get_day_transaction(update, context):
         return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
         update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
         return ConversationHandler.END
 
@@ -810,7 +832,8 @@ def get_overall(update, context):
         return CS.HANDLE_GET_OVERALL
     except Exception as e:
         update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -854,7 +877,8 @@ def handle_get_transaction(update, context):
             return CS.HANDLE_GET_TRANSACTION
     except Exception as e:
         update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -892,7 +916,8 @@ def handle_get_overall(update, context):
             return CS.HANDLE_GET_OVERALL
     except Exception as e:
         update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -909,7 +934,8 @@ def add_income(update, context):
         return CS.INCOME
     except Exception as e:
         update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -938,7 +964,8 @@ def income(update, context) -> int:
         return CS.WORK_PLACE
     except Exception as e:
         update.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -972,7 +999,8 @@ def cpf(update, context) -> int:
             update.callback_query.message.reply_text(INCOME_LIMIT_TEXT)
     except Exception as e:
         update.callback_query.message.reply_text(
-            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
@@ -1059,7 +1087,9 @@ def notify_all(update, context):
         no_of_users = db.get_user_count()
         keyboard = [
             [
-                InlineKeyboardButton(f"Send to {no_of_users} users", callback_data="confirm_send"),
+                InlineKeyboardButton(
+                    f"Send to {no_of_users} users", callback_data="confirm_send"
+                ),
                 InlineKeyboardButton("Cancel", callback_data="cancel_send"),
             ]
         ]
@@ -1074,7 +1104,7 @@ def notify_all(update, context):
 def notify_preview(update, context):
     query = update.callback_query
     query.answer()
-    
+
     try:
         if (
             query.data == "confirm_send"
@@ -1097,7 +1127,8 @@ def notify_preview(update, context):
             query.edit_message_text(text="Message sending cancelled.")
     except Exception as e:
         query.edit_message_text(
-            text=ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)), parse_mode=ParseMode.HTML
+            text=ERROR_TEXT + "\nError:\n" + utils.sanitize_error_message(str(e)),
+            parse_mode=ParseMode.HTML,
         )
     return ConversationHandler.END
 
